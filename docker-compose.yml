@@ -1,0 +1,32 @@
+version: '3'
+networks:
+  app-net:
+    driver: bridge
+services:
+  mongodb:
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    networks:
+      - app-net
+    volumes:
+      - './data:/data/db'
+  app-node:
+    build:
+      context: ./nodejs
+    ports:
+      - 8080:8080
+      - 443:443
+    #command: dasha account login ${APP_DASHA_ACCOUNT_LOGIN} --server=app.ru.dasha.ai
+    restart: always
+    networks:
+      - app-net
+    container_name: app
+    environment:
+      APP_PORT: ${APP_PORT}
+      APP_DSN: ${APP_DSN}
+      APP_SERVICE_NAME: ${APP_SERVICE_NAME}
+      APP_LOG_LEVEL: ${APP_LOG_LEVEL}
+      DASHA_APIKEY: ${DASHA_APIKEY}
+      DASHA_SERVER: ${DASHA_SERVER}
