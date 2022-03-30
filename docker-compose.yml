@@ -46,3 +46,4 @@ services:
       AMO_ID: ${AMO_ID}
       AMO_SECRET: ${AMO_SECRET}
       AMO_DOMAIN: ${AMO_DOMAIN}
+      AMO_REDIRECT_URI: ${AMO_REDIRECT_URI}
