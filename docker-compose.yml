@@ -25,7 +25,24 @@ services:
     environment:
       APP_PORT: ${APP_PORT}
       APP_DSN: ${APP_DSN}
-      APP_SERVICE_NAME: ${APP_SERVICE_NAME}
       APP_LOG_LEVEL: ${APP_LOG_LEVEL}
       DASHA_APIKEY: ${DASHA_APIKEY}
       DASHA_SERVER: ${DASHA_SERVER}
+  nginx:
+    image: nginx:latest
+    ports:
+      - '8090:80'
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ./php:/var/www
+      - ./logs:/var/log/nginx
+    links:
+      - php
+  php:
+    build: ./php
+    volumes:
+      - ./php:/var/www
+    environment:
+      AMO_ID: ${AMO_ID}
+      AMO_SECRET: ${AMO_SECRET}
+      AMO_DOMAIN: ${AMO_DOMAIN}
