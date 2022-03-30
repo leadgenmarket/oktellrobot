@@ -11,10 +11,17 @@ const HOST = '0.0.0.0';
 const app = express();
 
 const client = new MongoClient("mongodb://" + config.dsn);
+var dashaApi
+const initApp = async () => {
+  await client.connect()
+  dashaApi = await dasha.deploy('./dasha');
+}
+initApp()
 
 app.use(express.json());
 app.use(express.urlencoded());
 
+//тут обрабатываем все задания по обзвону
 app.get('/', (req, res) => {
   makeCall('+79627681333').catch((error) => {
     console.error(error);
@@ -23,10 +30,10 @@ app.get('/', (req, res) => {
   res.json({ payload: "message" })
 });
 
+//тут будут обрабатываться вебхуки amocrm
 app.post('/', async (req, res) => {
-  await client.connect()
-  let task = { leadID: parseInt(req.body.leadID), phone: req.body.phone, tries: 0 }
   const tasksCollection = client.db("leadgen").collection("tasks");
+  let task = { leadID: parseInt(req.body.leadID), phone: req.body.phone, tries: 0 }
   tasksCollection.insertOne(task, function (err, result) {
     if (err) {
       res.status(400);
@@ -36,12 +43,11 @@ app.post('/', async (req, res) => {
   });
 })
 
-app.listen(config.port, HOST);
+const server = app.listen(config.port, HOST);
 console.log(`Running on http://${HOST}:${config.port}`);
 
+//логика для совершения звонка
 async function makeCall(phone) {
-
-  const dashaApi = await dasha.deploy('./dasha');
   dashaApi.connectionProvider = async (conv) =>
     conv.input.phone === 'chat'
       ? dasha.chat.connect(await dasha.chat.createConsoleChat())
@@ -67,12 +73,31 @@ async function makeCall(phone) {
     }
   });
 
+
   const result = await conv.execute();
 
   console.log(result.output);
 
   await dashaApi.stop();
-  dashaApi.dispose();
 
   await logFile.close();
 }
+
+//gracefull shutdown
+const serverGracefullShutdown = () => {
+  console.info('SIGTERM signal received.');
+  server.close(() => {
+    console.log('Http server closed.');
+    client.close(() => {
+      console.log('mongo client disposed');
+    });
+    console.log('dasha dispose');
+    dashaApi.dispose();
+  });
+}
+
+process.on('SIGTERM', serverGracefullShutdown);
+
+process.on('SIGINT', serverGracefullShutdown);
+
+
