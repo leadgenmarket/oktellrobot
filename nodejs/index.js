@@ -2,11 +2,14 @@ const dasha = require('@dasha.ai/sdk');
 const fs = require('fs');
 const express = require('express');
 const config = require('./config');
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectID } = require('mongodb');
 
 
 // Constants
 const HOST = '0.0.0.0';
+const dbName = "leadgen";
+const tasksCollection = "tasks";
+const scenariosCollection = "scenarios";
 
 const app = express();
 
@@ -32,16 +35,119 @@ app.get('/', (req, res) => {
 
 //тут будут обрабатываться вебхуки amocrm
 app.post('/', async (req, res) => {
-  const tasksCollection = client.db("leadgen").collection("tasks");
+  const tasksCollection = client.db(dbName).collection(tasksCollection);
   let task = { leadID: parseInt(req.body.leadID), phone: req.body.phone, tries: 0 }
   tasksCollection.insertOne(task, function (err, result) {
     if (err) {
       res.status(400);
       res.json({ payload: "error", data: err })
+      return
     }
     res.json({ payload: "success", data: result.insertedId })
   });
 })
+
+//добавляет сценарии обзвонов
+app.put('/scenario', async (req, res) => {
+  const scenarios = client.db(dbName).collection(scenariosCollection);
+  let scenario = { name: req.body.name, phonesList: req.body.phonesList, maxTries: req.body.maxTries, successStatus: req.body.successStatus, discardStatus: req.body.discardStatus, callsFinishedStatus: req.body.callsFinishedStatus, addDay: req.body.addDay }
+  scenarios.insertOne(scenario, (err, result) => {
+    if (err) {
+      res.status(400);
+      res.json({ payload: "error", data: err })
+      return
+    }
+    res.json({ payload: "success", data: result.insertedId })
+  })
+})
+
+//список сценариев обзвонов
+app.get('/scenario', async (req, res) => {
+  const scenarios = client.db(dbName).collection(scenariosCollection);
+  let cursor = scenarios.find()
+  const results = await cursor.toArray();
+  res.json(results)
+})
+
+//удалить сценарий
+app.delete('/scenario/:id', async (req, res) => {
+  let id = req.params.id
+  const scenarios = client.db(dbName).collection(scenariosCollection);
+  scenarios.deleteOne({ _id: new ObjectID(id) }, (err, obj) => {
+    if (err || obj.deletedCount == 0) {
+      res.status(400);
+      res.json({ payload: "error" })
+      return
+    }
+    res.json({ payload: "success" })
+  })
+})
+
+//обновить сценарий обзвонов
+app.post('/scenario', async (req, res) => {
+  const scenarios = client.db(dbName).collection(scenariosCollection);
+  let scenario = { name: req.body.name, phonesList: req.body.phonesList, maxTries: req.body.maxTries, successStatus: req.body.successStatus, discardStatus: req.body.discardStatus, callsFinishedStatus: req.body.callsFinishedStatus, addDay: req.body.addDay }
+  scenarios.updateOne({ _id: new ObjectID(req.body.id) }, { $set: scenario }, (err, result) => {
+    if (err) {
+      res.status(400);
+      res.json({ payload: "error", data: err })
+      return
+    }
+    res.json({ payload: "success", data: result.insertedId })
+  })
+})
+
+
+//добавляет таску
+app.put('/task', async (req, res) => {
+  const scenarios = client.db(dbName).collection(scenariosCollection);
+  const tasks = client.db(dbName).collection(tasksCollection);
+  try {
+    scenarios.findOne({ _id: new ObjectID(req.body.scenarioID) }).then((result) => {
+      if (result != null) {
+        let task = { leadID: req.body.leadID, phone: req.body.phone, nextCallTime: Date.now(), tries: 0, scenarioID: req.body.scenarioID, success: null, finished: false }
+        tasks.insertOne(task, (err, result) => {
+          if (err) {
+            res.status(400);
+            res.json({ payload: "error", data: err })
+            return
+          }
+          res.json({ payload: "success", data: result.insertedId })
+        })
+      } else {
+        res.status(400);
+        res.json({ payload: "error", data: "no scenario id" })
+      }
+    })
+  } catch (e) {
+    res.status(400);
+    res.json({ payload: "error", data: "no scenario id" })
+  }
+})
+
+//список тасков обзвонов
+app.get('/task', async (req, res) => {
+  const tasks = client.db(dbName).collection(tasksCollection);
+  let cursor = tasks.find()
+  const results = await cursor.toArray();
+  res.json(results)
+})
+
+//удалить таску
+app.delete('/task/:id', async (req, res) => {
+  let id = req.params.id
+  const tasks = client.db(dbName).collection(tasksCollection);
+  tasks.deleteOne({ _id: new ObjectID(id) }, (err, obj) => {
+    if (err || obj.deletedCount == 0) {
+      res.status(400);
+      res.json({ payload: "error" })
+      return
+    }
+    res.json({ payload: "success" })
+  })
+})
+
+
 
 const server = app.listen(config.port, HOST);
 console.log(`Running on http://${HOST}:${config.port}`);
