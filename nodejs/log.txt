@@ -1,1 +1,105 @@
 ####################################################################################################
+ai: Здравствуйте, это портал новостроек, вы хотите приобрести квартиру?
+[
+  {
+    "type": "Intent",
+    "skill": "common_phrases",
+    "weight": -1,
+    "likelihood": -1,
+    "location": {
+      "start": 0,
+      "end": 0
+    },
+    "intent": "repeat",
+    "state": "positive",
+    "sentenceType": "request"
+  },
+  {
+    "type": "Intent",
+    "skill": "sentiment",
+    "weight": -1,
+    "likelihood": -1,
+    "location": {
+      "start": 0,
+      "end": 0
+    },
+    "intent": "verb",
+    "state": "positive",
+    "sentenceType": "statement"
+  }
+]
+human: повторите 
+ai: Я говорю, это портал новостроек, вы хотели приобрести квартиру?
+[
+  {
+    "type": "Intent",
+    "skill": "common_phrases",
+    "weight": -1,
+    "likelihood": -1,
+    "location": {
+      "start": 0,
+      "end": 1
+    },
+    "intent": "repeat",
+    "state": "positive",
+    "sentenceType": "request"
+  },
+  {
+    "type": "Intent",
+    "skill": "sentiment",
+    "weight": -1,
+    "likelihood": -1,
+    "location": {
+      "start": 0,
+      "end": 1
+    },
+    "intent": null,
+    "state": "neutral",
+    "sentenceType": "question"
+  },
+  {
+    "type": "Intent",
+    "skill": "3f053abbb593b3041abcb23b20da87b4:v2",
+    "weight": 0.53225,
+    "likelihood": 1,
+    "location": {
+      "start": -1,
+      "end": -1
+    },
+    "intent": "return_shipment",
+    "state": "positive",
+    "sentenceType": "statement"
+  }
+]
+human: что что 
+ai: Я говорю, это портал новостроек, вы хотели приобрести квартиру?
+[
+  {
+    "type": "Intent",
+    "skill": "sentiment",
+    "weight": -1,
+    "likelihood": -1,
+    "location": {
+      "start": 0,
+      "end": 0
+    },
+    "intent": null,
+    "state": "negative",
+    "sentenceType": "statement"
+  },
+  {
+    "type": "Intent",
+    "skill": "3f053abbb593b3041abcb23b20da87b4:v2",
+    "weight": 0.54493,
+    "likelihood": 1,
+    "location": {
+      "start": -1,
+      "end": -1
+    },
+    "intent": "missed_delivery",
+    "state": "positive",
+    "sentenceType": "statement"
+  }
+]
+human: нет 
+ai: Спасибо, всего доброго.

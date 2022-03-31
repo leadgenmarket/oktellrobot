@@ -14,7 +14,3 @@ $amoClient = new LeadgenAmoClient($baseDomain, $clientId, $clientSecret, $redire
 //$lead = $amoClient->getLeadById(29201257);
 //var_dump($amoClient->getLeadsPhoneNumber($lead));
 var_dump($amoClient->getLeadsOfPipelineInStatus(2010945, 29589345));
-
-
-
-

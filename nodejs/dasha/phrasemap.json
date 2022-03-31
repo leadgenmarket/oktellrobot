@@ -8,32 +8,22 @@
     "phrases": {
       "greeting": [
         {
-          "text": "Вы позвонили в Почту. Чем я могу вам помочь?"
+          "text": "Здравствуйте, это портал новостроек, вы хотите приобрести квартиру?"
         }
       ],
-      "track_parcel": [
+      "want_to_buy": [
         {
-          "text": "К сожалению, функция отслеживания посылки ещё не реализована"
+          "text": "Хорошо, отлично. Я передам менеджеру, он вам перезвонит."
         }
       ],
-      "missed_delivery": [
+      "dont_want_to_buy": [
         {
-          "text": "К сожалению, функция перезаписи доставки посылки ещё не реализована"
-        }
-      ],
-      "where_is_point": [
-        {
-          "text": "К сожалению, эта функция не реализована"
-        }
-      ],
-      "return_shipment": [
-        {
-          "text": "К сожалению, функция отмены доставки ещё не реализована"
+          "text": "Спасибо, всего доброго."
         }
       ],
       "i_will_call_back": [
         {
-          "text": "Okay, I'll call you later. Bye!"
+          "text": "Хорошо я перезвоню позже, пока!"
         }
       ],
       "hello": {
@@ -62,7 +52,7 @@
       ],
       "i_said": [
         {
-          "text": "Я говорю"
+          "text": "Я говорю, это портал новостроек, вы хотели приобрести квартиру?"
         }
       ],
       "sorry_wont_call": [
@@ -146,26 +136,18 @@
     },
     "types": {},
     "macros": {
-      "track_parcel": {},
-      "missed_delivery": {},
-      "where_is_point": {},
-      "return_shipment": {},
+      "repeat": {},
       "i_will_call_back": {},
-      "hello": {},
-      "when_callback": {},
-      "i_said": {},
-      "sorry_wont_call": {},
-      "i_will_wait": {},
+      "can_hear_you": {},
       "i_can_hear_you": {},
-      "dont_understand": {},
-      "dont_understand_hangup": {},
       "dont_understand_forward": {},
-      "mhm": {},
+      "dont_understand": {},
       "yes_i_am_a_robot": {},
-      "is_that_all": {},
-      "greeting": {},
-      "will_help": {},
-      "how_much": {}
+      "dont_understand_hangup": {},
+      "i_said": {},
+      "i_will_wait":{},
+      "sorry_wont_call":{},
+      "hello":{}
     }
   }
 }

@@ -49,9 +49,9 @@ digression repeat
         set digression.repeat.resetOnRecognized = false;
         for (var item in digression.repeat.responses)
         {
-            #say(item, repeatMode: "ignore");
+            #say(item, repeatMode: "override");
         }
-        #repeat();
+        //#repeat();
         return;
     }
     transitions

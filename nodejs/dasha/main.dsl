@@ -11,58 +11,39 @@ start node root
     {
         #connectSafe($phone);
         #waitForSpeech(1000);
-        #sayText("Тестовый тест. Проверка 1, 2, 3, 4?");
+        #sayText("Здравствуйте, это портал новостроек, вы хотите приобрести квартиру?");
         wait *;
     }
     transitions
     {
-        track_parcel: goto track_parcel on #messageHasIntent("track_parcel");
-        missed_delivery: goto missed_delivery on #messageHasIntent("missed_delivery");
-        where_is_point: goto where_is_point on #messageHasIntent("where_is_point");
-        return_shipment: goto return_shipment on #messageHasIntent("return_shipment");
+        want_to_buy: goto want_to_buy on #messageHasSentiment("positive");
+        dont_want_to_buy: goto dont_want_to_buy on #messageHasSentiment("negative");
     }
 }
-node track_parcel
+
+node want_to_buy
 {
     do
     {
-        #sayText("К сожалению, функция отслеживания посылки ещё не реализована.");
+        #sayText("Хорошо, отлично. Я передам менеджеру, он вам перезвонит.");
         exit;
     }
     transitions
     {
     }
 }
-node missed_delivery
+
+
+
+node dont_want_to_buy
 {
     do
     {
-        #sayText("К сожалению, функция перезаписи доставки посылки ещё не реализована.");
+        #sayText("Спасибо, всего доброго.");
         exit;
     }
     transitions
     {
     }
 }
-node where_is_point
-{
-    do
-    {
-        #sayText("К сожалению, функция отслеживания посылки не реализована.");
-        exit;
-    }
-    transitions
-    {
-    }
-}
-node return_shipment
-{
-    do
-    {
-        #sayText("К сожалению, функция отмены доставки ещё не реализована.");
-        exit;
-    }
-    transitions
-    {
-    }
-}
+

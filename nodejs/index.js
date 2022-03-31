@@ -154,6 +154,7 @@ console.log(`Running on http://${HOST}:${config.port}`);
 
 //логика для совершения звонка
 async function makeCall(phone) {
+  let intents = [];
   dashaApi.connectionProvider = async (conv) =>
     conv.input.phone === 'chat'
       ? dasha.chat.connect(await dasha.chat.createConsoleChat())
@@ -169,11 +170,22 @@ async function makeCall(phone) {
   await logFile.appendFile('#'.repeat(100) + '\n');
 
   conv.on('transcription', async (entry) => {
+    if (entry.speaker == "human") {
+      console.log(entry)
+      console.log(entry.text)
+    }
     await logFile.appendFile(`${entry.speaker}: ${entry.text}\n`);
   });
 
   conv.on('debugLog', async (event) => {
     if (event?.msg?.msgId === 'RecognizedSpeechMessage') {
+      if (event?.msg?.results[0]?.facts) {
+        event?.msg?.results[0]?.facts.forEach(fact => {
+          if (fact.intent) {
+            intents.push(fact.intent)
+          }
+        });
+      }
       const logEntry = event?.msg?.results[0]?.facts;
       await logFile.appendFile(JSON.stringify(logEntry, undefined, 2) + '\n');
     }
@@ -183,6 +195,29 @@ async function makeCall(phone) {
   const result = await conv.execute();
 
   console.log(result.output);
+  if (result.output.serviceStatus == "Done") {
+    console.log("звонок совершен")
+    console.log(intents);
+  } else {
+    console.log("не дозвон")
+  }
+
+  /*
+    result output
+
+    если сбросить или не поднять
+    {
+      status: 'Failed',
+      serviceStatus: 'ConnectionError',
+      callBackDetails: null
+    }
+
+    если подняли прям текст идет
+    {
+
+    }
+
+  */
 
   await dashaApi.stop();
 
@@ -205,5 +240,3 @@ const serverGracefullShutdown = () => {
 process.on('SIGTERM', serverGracefullShutdown);
 
 process.on('SIGINT', serverGracefullShutdown);
-
-
