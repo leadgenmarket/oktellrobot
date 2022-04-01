@@ -6,6 +6,8 @@ services:
   mongodb:
     image: mongo
     restart: always
+    ports:
+      - 27017:27017 #убрать
     networks:
       - app-net
     volumes:
@@ -29,7 +31,7 @@ services:
   nginx:
     image: nginx:latest
     ports:
-      - '80:80'
+      - '8090:80'
     volumes:
       - ./nginx:/etc/nginx/conf.d
       - ./php:/var/www
