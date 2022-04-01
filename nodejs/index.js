@@ -25,8 +25,9 @@ app.use(express.json());
 app.use(express.urlencoded());
 
 //тут обрабатываем все задания по обзвону
-app.get('/', (req, res) => {
-  makeCall('+79627681333').catch((error) => {
+app.get('/:phone', (req, res) => {
+  let phone = req.params.phone
+  makeCall(phone).catch((error) => {
     console.error(error);
     //process.exitCode = 1;
   });
