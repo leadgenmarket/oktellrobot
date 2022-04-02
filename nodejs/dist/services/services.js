@@ -12,7 +12,7 @@ var Services = /** @class */ (function () {
             _this.tasks.dashaApi.dispose();
         };
         this.scenarios = new scenarios_1.default(repos.scenarios);
-        this.tasks = new tasks_1.default(repos.tasks);
+        this.tasks = new tasks_1.default(repos);
     }
     return Services;
 }());

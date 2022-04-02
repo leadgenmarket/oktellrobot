@@ -1,16 +1,18 @@
 import {ObjectId} from "mongodb";
 
+//надо добавить название города
 export default class Task{
     _id?: ObjectId
     leadID: number
-    phone: string
     nextCallTime: number
     tries: number
-    scenarioID: number
+    phone?: string
+    cityName?:string
+    scenarioID: string
     success: boolean
     finished: boolean
 
-    constructor(id: string, leadID: number, phone: string, tries: number, scenarioID: number, nextCallTime?: number, success?: boolean, finished?: boolean){
+    constructor(id: string, leadID: number, scenarioID: string, phone?: string, cityName?:string, tries?: number, nextCallTime?: number, success?: boolean, finished?: boolean){
         if (id !== "") {
             if (ObjectId.isValid(id)){
                 this._id = new ObjectId(id)
@@ -21,7 +23,8 @@ export default class Task{
         this.leadID = leadID
         this.phone = phone
         this.nextCallTime = nextCallTime?nextCallTime:new Date().getTime()
-        this.tries = tries
+        this.tries = tries?tries:0
+        this.cityName = cityName
         this.scenarioID = scenarioID
         this.success = success?success:false
         this.finished = finished?finished:false
@@ -34,16 +37,19 @@ export default class Task{
         if (typeof this.leadID !== 'number') {
             return "leadID"
         }
-        if (typeof this.phone !== 'string') {
+        if (typeof this.phone !== 'string' && this.phone) {
             return "phone"
         }
-        if (typeof this.nextCallTime !== 'number') {
+        if (typeof this.nextCallTime !== 'number' && this.nextCallTime !== null) {
             return "nextCallTime"
+        }
+        if (typeof this.cityName !== 'string' && this.cityName) {
+            return "cityName"
         }
         if (typeof this.tries !== 'number') {
             return "tries"
         }
-        if (typeof this.scenarioID !== 'number') {
+        if ((typeof this.scenarioID !== 'string') || !ObjectId.isValid(this.scenarioID)) {
             return "scenarioID"
         }
         if (typeof this.success !== 'boolean') {

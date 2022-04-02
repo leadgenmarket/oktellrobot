@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var mongodb_1 = require("mongodb");
+//надо добавить название города
 var Task = /** @class */ (function () {
-    function Task(id, leadID, phone, tries, scenarioID, nextCallTime, success, finished) {
+    function Task(id, leadID, scenarioID, phone, cityName, tries, nextCallTime, success, finished) {
         var _this = this;
         this.validate = function () {
             if (typeof _this._id == 'undefined') {
@@ -11,16 +12,19 @@ var Task = /** @class */ (function () {
             if (typeof _this.leadID !== 'number') {
                 return "leadID";
             }
-            if (typeof _this.phone !== 'string') {
+            if (typeof _this.phone !== 'string' && _this.phone) {
                 return "phone";
             }
-            if (typeof _this.nextCallTime !== 'number') {
+            if (typeof _this.nextCallTime !== 'number' && _this.nextCallTime !== null) {
                 return "nextCallTime";
+            }
+            if (typeof _this.cityName !== 'string' && _this.cityName) {
+                return "cityName";
             }
             if (typeof _this.tries !== 'number') {
                 return "tries";
             }
-            if (typeof _this.scenarioID !== 'number') {
+            if ((typeof _this.scenarioID !== 'string') || !mongodb_1.ObjectId.isValid(_this.scenarioID)) {
                 return "scenarioID";
             }
             if (typeof _this.success !== 'boolean') {
@@ -42,7 +46,8 @@ var Task = /** @class */ (function () {
         this.leadID = leadID;
         this.phone = phone;
         this.nextCallTime = nextCallTime ? nextCallTime : new Date().getTime();
-        this.tries = tries;
+        this.tries = tries ? tries : 0;
+        this.cityName = cityName;
         this.scenarioID = scenarioID;
         this.success = success ? success : false;
         this.finished = finished ? finished : false;

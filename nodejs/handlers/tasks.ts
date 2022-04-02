@@ -13,7 +13,7 @@ export default class TasksHandlers {
 
     addTask = async (req: Request, res: Response) => {
         try{
-            var task = new Task(req.body.id, req.body.leadID, req.body.phone, req.body.tries, req.body.scenarioID, req.body.nextCallTime, req.body.success, req.body.finished)
+            var task = new Task(req.body.id, req.body.leadID, req.body.scenarioID, req.body.phone, req.body.cityName, req.body.tries, req.body.nextCallTime, req.body.success, req.body.finished)
         } catch (e) {
             res.status(400);
             Logger.error(`error parsing body addTask handler`)

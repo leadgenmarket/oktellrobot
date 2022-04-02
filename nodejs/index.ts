@@ -3,7 +3,6 @@ import bodyParser, { json } from 'body-parser';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import * as mongoDB from "mongodb"
-import * as expressPinoLogger from "express-pino-logger";
 import Services from './services/services';
 import Repositories from './repository/repositories';
 import Handlers from './handlers/handlers';
@@ -26,7 +25,7 @@ client.connect()
 let repositories = new Repositories(client, dbName)
 let services = new Services(repositories)
 let handlers = new Handlers(app, services)
-handlers.inintHandlers()
+handlers.initHandlers()
 
 
 

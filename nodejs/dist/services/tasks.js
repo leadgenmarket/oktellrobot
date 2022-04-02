@@ -54,20 +54,52 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var dasha = __importStar(require("@dasha.ai/sdk"));
+var amoBuf_1 = __importDefault(require("../domain/amoBuf"));
+var logger_1 = __importDefault(require("../utils/logger"));
 var fs = require('fs');
 var TasksService = /** @class */ (function () {
     function TasksService(repo) {
         var _this = this;
         this.add = function (task) { return __awaiter(_this, void 0, void 0, function () {
-            var result;
+            var scenario, taskRes, buf, amoBufRes;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.repository.add(task)];
+                    case 0: return [4 /*yield*/, this.repository.scenarios.getById(task.scenarioID)
+                        //если сценарий не существует, то возвращаем ошибку
+                    ];
                     case 1:
-                        result = _a.sent();
-                        return [2 /*return*/, result];
+                        scenario = _a.sent();
+                        //если сценарий не существует, то возвращаем ошибку
+                        if (scenario == null) {
+                            logger_1.default.error("error adding new task: unknown scenario");
+                            return [2 /*return*/, false];
+                        }
+                        return [4 /*yield*/, this.repository.tasks.add(task)
+                            //создаем задание в буфере, на получение из лида информации для php сервиса.
+                        ];
+                    case 2:
+                        taskRes = _a.sent();
+                        if (!(taskRes && task._id)) return [3 /*break*/, 4];
+                        buf = new amoBuf_1.default("", 2, task.leadID, task._id.toHexString());
+                        return [4 /*yield*/, this.repository.amoBuffer.add(buf)];
+                    case 3:
+                        amoBufRes = _a.sent();
+                        if (amoBufRes) {
+                            return [2 /*return*/, true];
+                        }
+                        else {
+                            logger_1.default.error("error adding amoBuf for new task");
+                            //удаляем таску в таком случае
+                            this.repository.tasks.delete(task._id.toHexString());
+                            return [2 /*return*/, false];
+                        }
+                        _a.label = 4;
+                    case 4: return [2 /*return*/];
                 }
             });
         }); };
@@ -75,7 +107,7 @@ var TasksService = /** @class */ (function () {
             var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.repository.update(task)];
+                    case 0: return [4 /*yield*/, this.repository.tasks.update(task)];
                     case 1:
                         result = _a.sent();
                         return [2 /*return*/, result];
@@ -86,7 +118,7 @@ var TasksService = /** @class */ (function () {
             var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.repository.delete(id)];
+                    case 0: return [4 /*yield*/, this.repository.tasks.delete(id)];
                     case 1:
                         result = _a.sent();
                         return [2 /*return*/, result];
@@ -97,7 +129,7 @@ var TasksService = /** @class */ (function () {
             var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.repository.list()];
+                    case 0: return [4 /*yield*/, this.repository.tasks.list()];
                     case 1:
                         result = _a.sent();
                         return [2 /*return*/, result];

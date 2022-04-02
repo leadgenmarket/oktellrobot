@@ -26,4 +26,9 @@ export default class ScenariosRepository {
         const result: mongoDB.WithId<mongoDB.Document>[] = await this.collection.find().toArray()
         return result
     }
+
+    getById = async (id: string) => {
+        const result: mongoDB.WithId<mongoDB.Document> | null = await this.collection.findOne({ _id: new mongoDB.ObjectID(id) });
+        return result
+    }
 }

@@ -1,12 +1,16 @@
 import Task from "../domain/tasks";
 import TasksRepository from "../repository/tasks";
 import * as dasha from "@dasha.ai/sdk"
+import Repositories from "../repository/repositories";
+import AmoBuffer from "../domain/amoBuf";
+import Logger from "../utils/logger";
 const fs = require('fs');
 
 export default class TasksService {
-    repository: TasksRepository
+    repository: Repositories
+
     dashaApi!:  dasha.Application<Record<string, unknown>, Record<string, unknown>>
-    constructor(repo: TasksRepository) {
+    constructor(repo: Repositories) {
         this.repository = repo
         dasha.deploy('./dasha').then((dashaDep: dasha.Application<Record<string, unknown>, Record<string, unknown>>)=>{
             this.dashaApi = dashaDep
@@ -14,23 +18,42 @@ export default class TasksService {
     }
 
     add = async (task: Task) => {
-        //тут надо добавить проверку, что сценарий существует
-        var result = await this.repository.add(task)
-        return result
+        let scenario = await this.repository.scenarios.getById(task.scenarioID)
+
+        //если сценарий не существует, то возвращаем ошибку
+        if (scenario == null) {
+          Logger.error("error adding new task: unknown scenario")
+          return false
+        }
+        var taskRes = await this.repository.tasks.add(task)
+
+        //создаем задание в буфере, на получение из лида информации для php сервиса.
+        if (taskRes && task._id) {
+          let buf = new AmoBuffer("", 2, task.leadID, task._id.toHexString())
+          let amoBufRes = await this.repository.amoBuffer.add(buf)
+          if (amoBufRes) {
+            return true
+          } else {
+            Logger.error("error adding amoBuf for new task")
+            //удаляем таску в таком случае
+            this.repository.tasks.delete(task._id.toHexString())
+            return false
+          }
+        }
     }
 
     update = async (task: Task) => {
-        var result = await this.repository.update(task)
+        var result = await this.repository.tasks.update(task)
         return result
     }
 
     delete = async (id: string) => {
-        var result = await this.repository.delete(id)
+        var result = await this.repository.tasks.delete(id)
         return result
     }
 
     list = async () => {
-      var result = await this.repository.list()
+      var result = await this.repository.tasks.list()
       return result
     }
 

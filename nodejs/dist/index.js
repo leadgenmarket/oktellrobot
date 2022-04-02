@@ -43,7 +43,7 @@ client.connect();
 var repositories = new repositories_1.default(client, dbName);
 var services = new services_1.default(repositories);
 var handlers = new handlers_1.default(app, services);
-handlers.inintHandlers();
+handlers.initHandlers();
 var server = app.listen(PORT, function () { return console.log("Running on " + PORT + " \u26A1"); });
 //gracefull shutdown
 var serverGracefullShutdown = function () {

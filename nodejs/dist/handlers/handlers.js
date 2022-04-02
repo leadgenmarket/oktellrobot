@@ -8,7 +8,7 @@ var tasks_1 = __importDefault(require("./tasks"));
 var Handlers = /** @class */ (function () {
     function Handlers(app, services) {
         var _this = this;
-        this.inintHandlers = function () {
+        this.initHandlers = function () {
             //scenarios
             _this.app.put("/scenario", _this.scenariosHandlers.addScenario);
             _this.app.post("/scenario", _this.scenariosHandlers.updateScenario);

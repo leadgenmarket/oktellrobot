@@ -14,7 +14,7 @@ export default class Handlers {
         this.tasksHandlers = new TasksHandlers(services.tasks)
     }
 
-    inintHandlers = () =>{
+    initHandlers = () =>{
         //scenarios
         this.app.put("/scenario", this.scenariosHandlers.addScenario)
         this.app.post("/scenario", this.scenariosHandlers.updateScenario)

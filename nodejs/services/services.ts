@@ -7,7 +7,7 @@ export default class Services {
     tasks: TasksService
     constructor(repos:Repositories){
         this.scenarios = new ScenariosService(repos.scenarios)
-        this.tasks = new TasksService(repos.tasks)
+        this.tasks = new TasksService(repos)
     }
 
     dispose = () => {

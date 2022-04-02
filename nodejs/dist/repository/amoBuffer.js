@@ -56,28 +56,28 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var mongoDB = __importStar(require("mongodb"));
-var ScenariosRepository = /** @class */ (function () {
-    function ScenariosRepository(db, CollectionName) {
+var AmoBufferRepository = /** @class */ (function () {
+    function AmoBufferRepository(db, CollectionName) {
         var _this = this;
-        this.add = function (scenario) { return __awaiter(_this, void 0, void 0, function () {
+        this.add = function (amoBuf) { return __awaiter(_this, void 0, void 0, function () {
             var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.collection.insertOne(scenario)];
+                    case 0: return [4 /*yield*/, this.collection.insertOne(amoBuf)];
                     case 1:
                         result = _a.sent();
                         return [2 /*return*/, result.acknowledged];
                 }
             });
         }); };
-        this.update = function (scenario) { return __awaiter(_this, void 0, void 0, function () {
+        this.update = function (amoBuf) { return __awaiter(_this, void 0, void 0, function () {
             var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.collection.updateOne({ _id: scenario._id }, { $set: scenario })];
+                    case 0: return [4 /*yield*/, this.collection.updateOne({ _id: amoBuf._id }, amoBuf)];
                     case 1:
                         result = _a.sent();
-                        return [2 /*return*/, result.modifiedCount > 0 ? true : false];
+                        return [2 /*return*/, result.upsertedCount > 0 ? true : false];
                 }
             });
         }); };
@@ -85,7 +85,7 @@ var ScenariosRepository = /** @class */ (function () {
             var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.collection.deleteOne({ _id: new mongoDB.ObjectID(id) })];
+                    case 0: return [4 /*yield*/, this.collection.deleteOne({ _id: new mongoDB.ObjectId(id) })];
                     case 1:
                         result = _a.sent();
                         return [2 /*return*/, result.deletedCount > 0 ? true : false];
@@ -103,19 +103,8 @@ var ScenariosRepository = /** @class */ (function () {
                 }
             });
         }); };
-        this.getById = function (id) { return __awaiter(_this, void 0, void 0, function () {
-            var result;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.collection.findOne({ _id: new mongoDB.ObjectID(id) })];
-                    case 1:
-                        result = _a.sent();
-                        return [2 /*return*/, result];
-                }
-            });
-        }); };
         this.collection = db.collection(CollectionName);
     }
-    return ScenariosRepository;
+    return AmoBufferRepository;
 }());
-exports.default = ScenariosRepository;
+exports.default = AmoBufferRepository;

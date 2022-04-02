@@ -51,7 +51,7 @@ var TasksHandlers = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         try {
-                            task = new tasks_1.default(req.body.id, req.body.leadID, req.body.phone, req.body.tries, req.body.scenarioID, req.body.nextCallTime, req.body.success, req.body.finished);
+                            task = new tasks_1.default(req.body.id, req.body.leadID, req.body.scenarioID, req.body.phone, req.body.cityName, req.body.tries, req.body.nextCallTime, req.body.success, req.body.finished);
                         }
                         catch (e) {
                             res.status(400);
