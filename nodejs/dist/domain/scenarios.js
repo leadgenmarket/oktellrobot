@@ -5,6 +5,9 @@ var Scenario = /** @class */ (function () {
     function Scenario(id, name, phonesList, maxTries, successStatus, discardStatus, callsFinishedStatus, addDay) {
         var _this = this;
         this.validate = function () {
+            if (typeof _this._id == 'undefined') {
+                return "_id";
+            }
             if (typeof _this.name !== 'string') {
                 return "name";
             }
@@ -28,9 +31,10 @@ var Scenario = /** @class */ (function () {
             }
             return "";
         };
-        console.log(id == "");
         if (id !== "") {
-            this._id = new mongodb_1.ObjectId(id);
+            if (mongodb_1.ObjectId.isValid(id)) {
+                this._id = new mongodb_1.ObjectId(id);
+            }
         }
         else {
             this._id = new mongodb_1.ObjectId();

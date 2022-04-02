@@ -14,6 +14,7 @@ export default class TasksService {
     }
 
     add = async (task: Task) => {
+        //тут надо добавить проверку, что сценарий существует
         var result = await this.repository.add(task)
         return result
     }
@@ -26,6 +27,11 @@ export default class TasksService {
     delete = async (id: string) => {
         var result = await this.repository.delete(id)
         return result
+    }
+
+    list = async () => {
+      var result = await this.repository.list()
+      return result
     }
 
     //функция для совершения звонка

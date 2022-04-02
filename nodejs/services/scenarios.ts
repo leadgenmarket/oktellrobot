@@ -21,4 +21,9 @@ export default class ScenariosService {
         var result = await this.repository.delete(id)
         return result
     }
+
+    list = async () => {
+        const result = await this.repository.list()
+        return result
+    }
 }

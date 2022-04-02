@@ -1,7 +1,7 @@
 import {ObjectId} from "mongodb";
 
 export default class Scenario {
-    _id: ObjectId
+    _id?: ObjectId
     name: string
     phonesList: string[] //нужно или нет это поле?
     maxTries: number
@@ -11,9 +11,11 @@ export default class Scenario {
     addDay: boolean
 
     constructor(id: string, name: string, phonesList: string[], maxTries: number, successStatus: number, discardStatus: number, callsFinishedStatus: number, addDay: boolean) {
-        console.log(id == "")
+        
         if (id !== "") {
-            this._id = new ObjectId(id)
+            if (ObjectId.isValid(id)){
+                this._id = new ObjectId(id)
+            }
         } else {
             this._id = new ObjectId()
         }
@@ -27,6 +29,9 @@ export default class Scenario {
     }
 
     validate = () => {
+        if (typeof this._id == 'undefined') {
+            return "_id"
+        }
         if (typeof this.name !== 'string') {
             return "name"
         }

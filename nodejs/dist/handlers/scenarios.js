@@ -41,6 +41,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var scenarios_1 = __importDefault(require("../domain/scenarios"));
 var logger_1 = __importDefault(require("../utils/logger"));
+var mongodb_1 = require("mongodb");
 var ScenariosHandlers = /** @class */ (function () {
     function ScenariosHandlers(scenarios) {
         var _this = this;
@@ -75,6 +76,79 @@ var ScenariosHandlers = /** @class */ (function () {
                             res.status(400);
                             res.json({ payload: "error" });
                         }
+                        return [2 /*return*/];
+                }
+            });
+        }); };
+        this.updateScenario = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+            var scenario, msg, result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        try {
+                            scenario = new scenarios_1.default(req.body.id, req.body.name, req.body.phonesList, req.body.maxTries, req.body.successStatus, req.body.discardStatus, req.body.callsFinishedStatus, req.body.addDay);
+                        }
+                        catch (e) {
+                            res.status(400);
+                            logger_1.default.error("error parsing body updateScenario handler");
+                            res.json({ payload: "error parsing body", err: e });
+                            return [2 /*return*/];
+                        }
+                        if (scenario.validate() !== "") {
+                            msg = "updateScenario: error in request check " + scenario.validate() + " param";
+                            logger_1.default.error(msg);
+                            res.status(400);
+                            res.json({ payload: msg });
+                            return [2 /*return*/];
+                        }
+                        return [4 /*yield*/, this.scenarios.update(scenario)];
+                    case 1:
+                        result = _a.sent();
+                        if (result) {
+                            res.json({ payload: "success" });
+                        }
+                        else {
+                            res.status(400);
+                            res.json({ payload: "error" });
+                        }
+                        return [2 /*return*/];
+                }
+            });
+        }); };
+        this.deleteScenario = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+            var id, result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        id = req.params.id;
+                        if (!mongodb_1.ObjectId.isValid(id)) {
+                            res.status(400);
+                            logger_1.default.error("deleteScenario not valid id");
+                            res.json({ payload: "not valid id" });
+                            return [2 /*return*/];
+                        }
+                        return [4 /*yield*/, this.scenarios.delete(id)];
+                    case 1:
+                        result = _a.sent();
+                        if (result) {
+                            res.json({ payload: "success" });
+                        }
+                        else {
+                            res.status(400);
+                            res.json({ payload: "error" });
+                        }
+                        return [2 /*return*/];
+                }
+            });
+        }); };
+        this.getAllScenarios = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+            var result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.scenarios.list()];
+                    case 1:
+                        result = _a.sent();
+                        res.json({ payload: result });
                         return [2 /*return*/];
                 }
             });

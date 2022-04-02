@@ -13,12 +13,17 @@ export default class ScenariosRepository {
     }
 
     update = async (scenario: Scenario) => {
-        const result: mongoDB.UpdateResult = await this.collection.updateOne({ _id: scenario._id }, scenario);
-        return result.upsertedCount>0?true:false
+        const result: mongoDB.UpdateResult = await this.collection.updateOne({ _id: scenario._id }, {$set: scenario});
+        return result.modifiedCount>0?true:false
     }
 
     delete = async (id: string) => {
-        const result: mongoDB.DeleteResult = await this.collection.deleteOne({ _id: new mongoDB.ObjectId(id) });
+        const result: mongoDB.DeleteResult = await this.collection.deleteOne({ _id: new mongoDB.ObjectID(id) });
         return result.deletedCount>0?true:false
+    }
+
+    list = async () => {
+        const result: mongoDB.WithId<mongoDB.Document>[] = await this.collection.find().toArray()
+        return result
     }
 }

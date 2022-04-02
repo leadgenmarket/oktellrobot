@@ -22,4 +22,9 @@ export default class TasksRepository {
         const result: mongoDB.DeleteResult = await this.collection.deleteOne({ _id: new mongoDB.ObjectId(id) });
         return result.deletedCount>0?true:false
     }
+
+    list = async () => {
+        const result: mongoDB.WithId<mongoDB.Document>[] = await this.collection.find().toArray()
+        return result
+    }
 }

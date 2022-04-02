@@ -93,6 +93,17 @@ var TasksService = /** @class */ (function () {
                 }
             });
         }); };
+        this.list = function () { return __awaiter(_this, void 0, void 0, function () {
+            var result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.repository.list()];
+                    case 1:
+                        result = _a.sent();
+                        return [2 /*return*/, result];
+                }
+            });
+        }); };
         this.repository = repo;
         dasha.deploy('./dasha').then(function (dashaDep) {
             _this.dashaApi = dashaDep;

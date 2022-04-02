@@ -74,10 +74,10 @@ var ScenariosRepository = /** @class */ (function () {
             var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.collection.updateOne({ _id: scenario._id }, scenario)];
+                    case 0: return [4 /*yield*/, this.collection.updateOne({ _id: scenario._id }, { $set: scenario })];
                     case 1:
                         result = _a.sent();
-                        return [2 /*return*/, result.upsertedCount > 0 ? true : false];
+                        return [2 /*return*/, result.modifiedCount > 0 ? true : false];
                 }
             });
         }); };
@@ -85,10 +85,21 @@ var ScenariosRepository = /** @class */ (function () {
             var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.collection.deleteOne({ _id: new mongoDB.ObjectId(id) })];
+                    case 0: return [4 /*yield*/, this.collection.deleteOne({ _id: new mongoDB.ObjectID(id) })];
                     case 1:
                         result = _a.sent();
                         return [2 /*return*/, result.deletedCount > 0 ? true : false];
+                }
+            });
+        }); };
+        this.list = function () { return __awaiter(_this, void 0, void 0, function () {
+            var result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.collection.find().toArray()];
+                    case 1:
+                        result = _a.sent();
+                        return [2 /*return*/, result];
                 }
             });
         }); };

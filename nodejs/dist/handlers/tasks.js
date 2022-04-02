@@ -35,56 +35,91 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-var ScenariosService = /** @class */ (function () {
-    function ScenariosService(repo) {
+var tasks_1 = __importDefault(require("../domain/tasks"));
+var logger_1 = __importDefault(require("../utils/logger"));
+var mongodb_1 = require("mongodb");
+var TasksHandlers = /** @class */ (function () {
+    function TasksHandlers(tasks) {
         var _this = this;
-        this.add = function (scenario) { return __awaiter(_this, void 0, void 0, function () {
-            var result;
+        this.addTask = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+            var task, msg, result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.repository.add(scenario)];
+                    case 0:
+                        try {
+                            task = new tasks_1.default(req.body.id, req.body.leadID, req.body.phone, req.body.tries, req.body.scenarioID, req.body.nextCallTime, req.body.success, req.body.finished);
+                        }
+                        catch (e) {
+                            res.status(400);
+                            logger_1.default.error("error parsing body addTask handler");
+                            res.json({ payload: "error parsing body", err: e });
+                            return [2 /*return*/];
+                        }
+                        if (task.validate() !== "") {
+                            msg = "addTask: error in request check " + task.validate() + " param";
+                            logger_1.default.error(msg);
+                            res.status(400);
+                            res.json({ payload: msg });
+                            return [2 /*return*/];
+                        }
+                        return [4 /*yield*/, this.tasks.add(task)];
                     case 1:
                         result = _a.sent();
-                        return [2 /*return*/, result];
+                        if (result) {
+                            res.json({ payload: "success", id: task._id });
+                        }
+                        else {
+                            res.status(400);
+                            res.json({ payload: "error" });
+                        }
+                        return [2 /*return*/];
                 }
             });
         }); };
-        this.update = function (scenario) { return __awaiter(_this, void 0, void 0, function () {
-            var result;
+        this.deleteTask = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+            var id, result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.repository.update(scenario)];
+                    case 0:
+                        id = req.params.id;
+                        if (!mongodb_1.ObjectId.isValid(id)) {
+                            res.status(400);
+                            logger_1.default.error("deleteTask not valid id");
+                            res.json({ payload: "not valid id" });
+                            return [2 /*return*/];
+                        }
+                        return [4 /*yield*/, this.tasks.delete(id)];
                     case 1:
                         result = _a.sent();
-                        return [2 /*return*/, result];
+                        if (result) {
+                            res.json({ payload: "success" });
+                        }
+                        else {
+                            res.status(400);
+                            res.json({ payload: "error" });
+                        }
+                        return [2 /*return*/];
                 }
             });
         }); };
-        this.delete = function (id) { return __awaiter(_this, void 0, void 0, function () {
+        this.getAllTasks = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
             var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.repository.delete(id)];
+                    case 0: return [4 /*yield*/, this.tasks.list()];
                     case 1:
                         result = _a.sent();
-                        return [2 /*return*/, result];
+                        res.json({ payload: result });
+                        return [2 /*return*/];
                 }
             });
         }); };
-        this.list = function () { return __awaiter(_this, void 0, void 0, function () {
-            var result;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.repository.list()];
-                    case 1:
-                        result = _a.sent();
-                        return [2 /*return*/, result];
-                }
-            });
-        }); };
-        this.repository = repo;
+        this.tasks = tasks;
     }
-    return ScenariosService;
+    return TasksHandlers;
 }());
-exports.default = ScenariosService;
+exports.default = TasksHandlers;
