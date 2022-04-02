@@ -5,6 +5,6 @@ up:
 up-log:
 	@docker-compose up
 up-develop:
-	@docker-compose -f docker-compose_develop.yml up
+	@docker-compose -f docker-compose_develop.yml up & disown
 run:
 	@cd nodejs && npm run start
