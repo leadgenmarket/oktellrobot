@@ -10,7 +10,7 @@ export default class TasksHandlers {
     constructor(tasks: TasksService) {
         this.tasks = tasks
     }
-    
+
     addFromWebHook = async (req: Request, res: Response) => {
         let scenarioID = req.params.scenarioID
         console.log(scenarioID)
@@ -24,10 +24,22 @@ export default class TasksHandlers {
                 leadID = parseInt(req.body.leads.add[0].id)
             }
         }
-        console.log(leadID)
-        res.json({ payload: "ok"})
+        var task = new Task("", leadID, scenarioID)
+        var result = await this.tasks.add(task)
+        if (result) {
+            res.json({ payload: "success", id: task._id})
+        } else {
+            res.status(400);
+            res.json({ payload: "error"})
+        }
     }
 
+    makeCalls = async (req: Request, res: Response) => {
+        let result = await this.tasks.makeCalls()
+        res.json({ payload: result})
+    }
+
+    //remove if not neded
     addTask = async (req: Request, res: Response) => {
         try{
             var task = new Task(req.body.id, req.body.leadID, req.body.scenarioID, req.body.phone, req.body.cityName, req.body.tries, req.body.nextCallTime, req.body.success, req.body.finished)

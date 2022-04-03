@@ -57,6 +57,25 @@ export default class TasksService {
       return result
     }
 
+    makeCalls = async () => {
+      var callsList = await this.repository.tasks.getTasksToCall()
+      callsList.forEach(async (task) => {
+        let scenario = await this.repository.scenarios.getById(task.scenarioID)
+        await this.makeCall(this.formatPhone(task.phone), this.dashaApi)
+      })
+      return true
+    }
+
+    formatPhone = (phoneInput: string) => {
+      let phone  = phoneInput.replace(/[^0-9\.]+/g, '')
+      if (phone[0] == '8') {
+        phone = "+7" + phone.substring(1)
+      } else if  (phone[0] == '7') {
+        phone = "+" + phone
+      }
+      return phone
+    }
+
     //функция для совершения звонка
     protected async makeCall(phone: string, dashaApi: dasha.Application<Record<string, unknown>, Record<string, unknown>>) {
         let intents: string[] = [];

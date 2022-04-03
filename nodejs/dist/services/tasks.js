@@ -136,6 +136,44 @@ var TasksService = /** @class */ (function () {
                 }
             });
         }); };
+        this.makeCalls = function () { return __awaiter(_this, void 0, void 0, function () {
+            var callsList;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.repository.tasks.getTasksToCall()];
+                    case 1:
+                        callsList = _a.sent();
+                        callsList.forEach(function (task) { return __awaiter(_this, void 0, void 0, function () {
+                            var scenario;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0: return [4 /*yield*/, this.repository.scenarios.getById(task.scenarioID)];
+                                    case 1:
+                                        scenario = _a.sent();
+                                        console.log(scenario);
+                                        console.log(task);
+                                        return [4 /*yield*/, this.makeCall(this.formatPhone(task.phone), this.dashaApi)];
+                                    case 2:
+                                        _a.sent();
+                                        return [2 /*return*/];
+                                }
+                            });
+                        }); });
+                        return [2 /*return*/, true];
+                }
+            });
+        }); };
+        this.formatPhone = function (phoneInput) {
+            var phone = phoneInput.replace(/[^0-9\.]+/g, '');
+            if (phone[0] == '8') {
+                phone = "+7" + phone.substring(1);
+            }
+            else if (phone[0] == '7') {
+                phone = "+" + phone;
+            }
+            return phone;
+        };
         this.repository = repo;
         dasha.deploy('./dasha').then(function (dashaDep) {
             _this.dashaApi = dashaDep;

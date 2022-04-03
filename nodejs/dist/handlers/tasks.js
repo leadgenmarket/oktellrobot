@@ -46,24 +46,49 @@ var TasksHandlers = /** @class */ (function () {
     function TasksHandlers(tasks) {
         var _this = this;
         this.addFromWebHook = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-            var scenarioID, leadID;
+            var scenarioID, leadID, task, result;
             return __generator(this, function (_a) {
-                scenarioID = req.params.scenarioID;
-                console.log(scenarioID);
-                leadID = 0;
-                if (req.body.leads) {
-                    if (req.body.leads.status) {
-                        leadID = parseInt(req.body.leads.status[0].id);
-                    }
-                    if (req.body.leads.add) {
-                        leadID = parseInt(req.body.leads.add[0].id);
-                    }
+                switch (_a.label) {
+                    case 0:
+                        scenarioID = req.params.scenarioID;
+                        console.log(scenarioID);
+                        leadID = 0;
+                        if (req.body.leads) {
+                            if (req.body.leads.status) {
+                                leadID = parseInt(req.body.leads.status[0].id);
+                            }
+                            if (req.body.leads.add) {
+                                leadID = parseInt(req.body.leads.add[0].id);
+                            }
+                        }
+                        task = new tasks_1.default("", leadID, scenarioID);
+                        return [4 /*yield*/, this.tasks.add(task)];
+                    case 1:
+                        result = _a.sent();
+                        if (result) {
+                            res.json({ payload: "success", id: task._id });
+                        }
+                        else {
+                            res.status(400);
+                            res.json({ payload: "error" });
+                        }
+                        return [2 /*return*/];
                 }
-                console.log(leadID);
-                res.json({ payload: "ok" });
-                return [2 /*return*/];
             });
         }); };
+        this.makeCalls = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+            var result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.tasks.makeCalls()];
+                    case 1:
+                        result = _a.sent();
+                        res.json({ payload: result });
+                        return [2 /*return*/];
+                }
+            });
+        }); };
+        //remove if not neded
         this.addTask = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
             var task, msg, result;
             return __generator(this, function (_a) {

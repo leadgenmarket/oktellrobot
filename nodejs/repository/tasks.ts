@@ -27,4 +27,9 @@ export default class TasksRepository {
         const result: mongoDB.WithId<mongoDB.Document>[] = await this.collection.find().toArray()
         return result
     }
+
+    getTasksToCall = async () => {
+        const result: mongoDB.WithId<mongoDB.Document>[] = await this.collection.find({phone: { $ne: null }, cityName: { $ne: null }, finished: false}).toArray()
+        return result
+    }
 }
