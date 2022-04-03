@@ -45,22 +45,6 @@ var mongodb_1 = require("mongodb");
 var TasksHandlers = /** @class */ (function () {
     function TasksHandlers(tasks) {
         var _this = this;
-        /*
-            при переходе в статус
-    
-            { status: [
-                {
-                    id: '29292515',
-                    status_id: '47172541',
-                    pipeline_id: '5292523',
-                    old_status_id: '47172544',
-                    old_pipeline_id: '5292523'
-                    }
-                ]
-                }
-            если новый лид, то так
-            {   add: [ { id: '29292623', status_id: '47172541', pipeline_id: '5292523' } ]}
-        */
         this.addFromWebHook = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
             var scenarioID, leadID;
             return __generator(this, function (_a) {

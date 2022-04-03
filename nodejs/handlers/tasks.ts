@@ -10,24 +10,7 @@ export default class TasksHandlers {
     constructor(tasks: TasksService) {
         this.tasks = tasks
     }
-
-    /*
-        при переходе в статус
-
-        { status: [
-            {
-                id: '29292515',
-                status_id: '47172541',
-                pipeline_id: '5292523',
-                old_status_id: '47172544',
-                old_pipeline_id: '5292523'
-                }
-            ]
-            }
-        если новый лид, то так
-        {   add: [ { id: '29292623', status_id: '47172541', pipeline_id: '5292523' } ]}
-    */
-
+    
     addFromWebHook = async (req: Request, res: Response) => {
         let scenarioID = req.params.scenarioID
         console.log(scenarioID)
