@@ -14,7 +14,9 @@ export default class TasksHandlers {
     addFromWebHook = async (req: Request, res: Response) => {
         let scenarioID = req.params.scenarioID
         console.log(scenarioID)
-        console.log(req.body)
+        if (req.body.lead){
+            console.log(req.body.lead)
+        }
         res.json({ payload: "ok"})
     }
 

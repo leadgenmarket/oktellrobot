@@ -48,6 +48,7 @@ services:
       AMO_ID: ${AMO_ID}
       AMO_SECRET: ${AMO_SECRET}
       AMO_DOMAIN: ${AMO_DOMAIN}
+      APP_DSN: ${APP_DSN}
       AMO_REDIRECT_URI: ${AMO_REDIRECT_URI}
     networks:
       - app-net
