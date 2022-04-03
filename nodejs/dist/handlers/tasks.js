@@ -69,10 +69,10 @@ var TasksHandlers = /** @class */ (function () {
                 leadID = 0;
                 if (req.body.leads) {
                     if (req.body.leads.status) {
-                        leadID = parseInt(req.body.leads.status.id);
+                        leadID = parseInt(req.body.leads.status[0].id);
                     }
                     if (req.body.leads.add) {
-                        leadID = parseInt(req.body.leads.add.id);
+                        leadID = parseInt(req.body.leads.add[0].id);
                     }
                 }
                 console.log(leadID);
