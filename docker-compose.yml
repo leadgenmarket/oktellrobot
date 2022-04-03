@@ -26,29 +26,29 @@ services:
       APP_LOG_LEVEL: ${APP_LOG_LEVEL}
       DASHA_APIKEY: ${DASHA_APIKEY}
       DASHA_SERVER: ${DASHA_SERVER}
-  nginx:
-    image: nginx:latest
-    ports:
-        - "8090:80"
-    restart: always
-    volumes:
-        - ./nginx:/etc/nginx/conf.d
-        - ./php/amocrm:/var/www/amocrm
-    networks:
-      - app-net
-    depends_on:
-        - php
-  php:
-    build:
-      context: ./php
-    volumes:
-      - ./php/php.ini:/usr/local/etc/php/conf.d/php.ini
-      - ./php/amocrm:/var/www/amocrm
-    environment:
-      AMO_ID: ${AMO_ID}
-      AMO_SECRET: ${AMO_SECRET}
-      AMO_DOMAIN: ${AMO_DOMAIN}
-      APP_DSN: ${APP_DSN}
-      AMO_REDIRECT_URI: ${AMO_REDIRECT_URI}
-    networks:
-      - app-net
+  #nginx:
+  #  image: nginx:latest
+  #  ports:
+  #      - "8090:80"
+  #  restart: always
+  #  volumes:
+  #      - ./nginx:/etc/nginx/conf.d
+  #      - ./php/amocrm:/var/www/amocrm
+  #  networks:
+  #    - app-net
+  #  depends_on:
+  #      - php
+  #php:
+  #  build:
+  #    context: ./php
+  #  volumes:
+  #    - ./php/php.ini:/usr/local/etc/php/conf.d/php.ini
+  #    - ./php/amocrm:/var/www/amocrm
+  #  environment:
+  #    AMO_ID: ${AMO_ID}
+  #    AMO_SECRET: ${AMO_SECRET}
+  #    AMO_DOMAIN: ${AMO_DOMAIN}
+  #    APP_DSN: ${APP_DSN}
+  #    AMO_REDIRECT_URI: ${AMO_REDIRECT_URI}
+  #  networks:
+  #    - app-net
