@@ -29,19 +29,25 @@ services:
   nginx:
     image: nginx:latest
     ports:
-      - '8090:80'
+        - "8090:80"
+    restart: always
     volumes:
-      - ./nginx:/etc/nginx/conf.d
-      - ./php:/var/www
-      - ./logs:/var/log/nginx
-    links:
-      - php
+        - ./nginx:/etc/nginx/conf.d
+        - ./php/amocrm:/var/www/amocrm
+    networks:
+      - app-net
+    depends_on:
+        - php
   php:
-    build: ./php
+    build:
+      context: ./php
     volumes:
-      - ./php:/var/www
+      - ./php/php.ini:/usr/local/etc/php/conf.d/php.ini
+      - ./php/amocrm:/var/www/amocrm
     environment:
       AMO_ID: ${AMO_ID}
       AMO_SECRET: ${AMO_SECRET}
       AMO_DOMAIN: ${AMO_DOMAIN}
       AMO_REDIRECT_URI: ${AMO_REDIRECT_URI}
+    networks:
+      - app-net

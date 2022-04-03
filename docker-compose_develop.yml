@@ -6,28 +6,51 @@ services:
   mongodb:
     image: mongo
     restart: always
-    ports:
-      - 27017:27017 #убрать
     networks:
       - app-net
     volumes:
       - './data:/data/db'
+    ports:
+      - '27017:27017'
+  app-node:
+    build:
+      context: ./nodejs
+    ports:
+      - 8080:8080
+      - 443:443
+    restart: always
+    networks:
+      - app-net
+    container_name: app
+    environment:
+      APP_PORT: ${APP_PORT}
+      APP_DSN: ${APP_DSN}
+      APP_LOG_LEVEL: ${APP_LOG_LEVEL}
+      DASHA_APIKEY: ${DASHA_APIKEY}
+      DASHA_SERVER: ${DASHA_SERVER}
   nginx:
     image: nginx:latest
     ports:
-      - '8090:80'
+        - "8090:80"
+    restart: always
     volumes:
-      - ./nginx:/etc/nginx/conf.d
-      - ./php:/var/www
-      - ./logs:/var/log/nginx
-    links:
-      - php
+        - ./nginx:/etc/nginx/conf.d
+        - ./php/amocrm:/var/www/amocrm
+    networks:
+      - app-net
+    depends_on:
+        - php
   php:
-    build: ./php
+    build:
+      context: ./php
     volumes:
-      - ./php:/var/www
+      - ./php/php.ini:/usr/local/etc/php/conf.d/php.ini
+      - ./php/amocrm:/var/www/amocrm
     environment:
       AMO_ID: ${AMO_ID}
       AMO_SECRET: ${AMO_SECRET}
       AMO_DOMAIN: ${AMO_DOMAIN}
+      APP_DSN: ${APP_DSN}
       AMO_REDIRECT_URI: ${AMO_REDIRECT_URI}
+    networks:
+      - app-net
