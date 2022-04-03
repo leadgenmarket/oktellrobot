@@ -13,13 +13,12 @@ $redirectUri = $_ENV["AMO_REDIRECT_URI"];
 
 $repsoitory = new Repository($_ENV["APP_DSN"]);
 $amoClient = new LeadgenAmoClient($baseDomain, $clientId, $clientSecret, $redirectUri);
-$lead = $amoClient->getLeadById(29201257);
 
-$amoBufList = $repsoitory->getAmoBuffList();
+$amoBufList = $repsoitory->getAmoBuffList(20);
 
 foreach($amoBufList as $item) {
   //типы заданий amobuf
-  echo"<pre>";var_dump($item);echo"</pre>";
+  //echo"<pre>";var_dump($item);echo"</pre>";
   switch ($item->type) {
     case 0:
       //добавляем лид
@@ -29,20 +28,35 @@ foreach($amoBufList as $item) {
       break;
     case 2:
       //получаем инфу о лиде из crm и обновлем в таске
+      $result = getLeadInfoFromAmoAndUpdateTask($amoClient, $repsoitory, $item->leadID, $item->taskID);
+      if ($result) {
+        //если успешно, то удаляем amoBuf
+        $result = $repsoitory->deleteAmoBufTask($item->_id);
+        if ($result) {
+          var_dump('task successfully done');
+        }
+      }
       break;
   }
 }
 
-function getLeadInfoFromAmoAndUpdateTask(int $leadID, string $taskID){
-  $task = $repsoitory->getTaskById($item->taskID);
-  if ($task != null) {
-    echo"<pre>";var_dump($task);echo"</pre>";
-  } else {
-    //нету таски, можно удалить задание amoBuf
+function getLeadInfoFromAmoAndUpdateTask(LeadgenAmoClient $amoClient, Repository $repsoitory, int $leadID, string $taskID){
+  $task = $repsoitory->getTaskById($taskID);
+  if ($task == null) {
+    return false;
   }
+  $lead = $amoClient->getLeadById($leadID);
+  if ($lead == null) {
+    return false;
+  }
+  $phone = $amoClient->getLeadsPhoneNumber($lead);
+  $city = $amoClient->getLeadsCity($lead);
+  $task->phone = $phone;
+  $task->cityName = $city;
+  $result = $repsoitory->updateTask($task);
+  return $result;
 }
 
-/*
 //$lead = $amoClient->getLeadById(29201257);
 //var_dump($amoClient->getLeadsPhoneNumber($lead));
 //var_dump($amoClient->getLeadsOfPipelineInStatus(2010945, 29589345));

@@ -130,6 +130,19 @@ class LeadgenAmoClient {
       return null;
     }
 
+    //функция возвращает город из лида
+    public function getLeadsCity(AmoCRM\Models\LeadModel $lead): string
+    {
+      $customFields = $lead->getCustomFieldsValues();
+      try {
+        $city = $customFields->getBy('fieldId', 416699)->getValues()[0]->getValue();
+        return $city;
+      } catch (AmoCRMApiException $e) {
+        return null;
+      }
+      
+    }
+
     //ищет лиды в заданом статусе
     public function getLeadsOfPipelineInStatus(int $pipelineID, int $statusID): AmoCRM\Collections\Leads\LeadsCollection
     {
