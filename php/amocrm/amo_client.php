@@ -36,7 +36,7 @@ use AmoCRM\Filters\LeadsFilter;
 define('TOKEN_FILE', 'token_info.json');
 
 class LeadgenAmoClient {
-    public $apiClient;
+    protected $apiClient;
    
 
     function __construct(string $baseDomain, string $clientId, string $clientSecret, string $redirectUri) {
@@ -60,8 +60,8 @@ class LeadgenAmoClient {
         
             if ($accessToken->hasExpired()) {
               try {
-        
                 $accessToken = $apiClient->getOAuthClient()->getAccessTokenByRefreshToken($accessToken);
+                
                 saveToken([
                   'accessToken' => $accessToken->getToken(),
                   'refreshToken' => $accessToken->getRefreshToken(),
@@ -69,12 +69,13 @@ class LeadgenAmoClient {
                   'baseDomain' => $apiClient->getAccountBaseDomain(),
                 ]);
               } catch (Exception $e) {
-                die((string)$e);
+                echo "<pre>";var_dump($e);echo"</pre>";
+                //die((string)$e);
               }
             }
             $apiClient->setAccessToken($accessToken);
           } catch (AmoCRMApiException $e) {
-            printError($e);
+            echo "<pre>";var_dump($e);echo"</pre>";
             die;
           }
           $this->apiClient = $apiClient;
