@@ -50,7 +50,9 @@ var TasksHandlers = /** @class */ (function () {
             return __generator(this, function (_a) {
                 scenarioID = req.params.scenarioID;
                 console.log(scenarioID);
-                console.log(req.body);
+                if (req.body.leads) {
+                    console.log(req.body.leads);
+                }
                 res.json({ payload: "ok" });
                 return [2 /*return*/];
             });
