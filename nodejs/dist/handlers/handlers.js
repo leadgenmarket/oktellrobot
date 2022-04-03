@@ -15,6 +15,7 @@ var Handlers = /** @class */ (function () {
             _this.app.delete("/scenario/:id", _this.scenariosHandlers.deleteScenario);
             _this.app.get("/scenario", _this.scenariosHandlers.getAllScenarios);
             //tasks
+            _this.app.post('/task/:scenarioID', _this.tasksHandlers.addFromWebHook);
             _this.app.put("/task", _this.tasksHandlers.addTask);
             _this.app.delete("/task/:id", _this.tasksHandlers.deleteTask);
             _this.app.get("/task", _this.tasksHandlers.getAllTasks);

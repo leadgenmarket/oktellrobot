@@ -45,6 +45,16 @@ var mongodb_1 = require("mongodb");
 var TasksHandlers = /** @class */ (function () {
     function TasksHandlers(tasks) {
         var _this = this;
+        this.addFromWebHook = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+            var scenarioID;
+            return __generator(this, function (_a) {
+                scenarioID = req.params.scenarioID;
+                console.log(scenarioID);
+                console.log(req.body);
+                res.json({ payload: "ok" });
+                return [2 /*return*/];
+            });
+        }); };
         this.addTask = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
             var task, msg, result;
             return __generator(this, function (_a) {

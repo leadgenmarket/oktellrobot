@@ -11,6 +11,13 @@ export default class TasksHandlers {
         this.tasks = tasks
     }
 
+    addFromWebHook = async (req: Request, res: Response) => {
+        let scenarioID = req.params.scenarioID
+        console.log(scenarioID)
+        console.log(req.body)
+        res.json({ payload: "ok"})
+    }
+
     addTask = async (req: Request, res: Response) => {
         try{
             var task = new Task(req.body.id, req.body.leadID, req.body.scenarioID, req.body.phone, req.body.cityName, req.body.tries, req.body.nextCallTime, req.body.success, req.body.finished)

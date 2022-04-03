@@ -56,7 +56,3 @@ function getLeadInfoFromAmoAndUpdateTask(LeadgenAmoClient $amoClient, Repository
   $result = $repsoitory->updateTask($task);
   return $result;
 }
-
-//$lead = $amoClient->getLeadById(29201257);
-//var_dump($amoClient->getLeadsPhoneNumber($lead));
-//var_dump($amoClient->getLeadsOfPipelineInStatus(2010945, 29589345));
