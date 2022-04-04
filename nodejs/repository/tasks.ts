@@ -14,7 +14,7 @@ export default class TasksRepository {
     }
 
     update = async (task: Task) => {
-        const result: mongoDB.UpdateResult = await this.collection.updateOne({ _id: task._id }, task);
+        const result: mongoDB.UpdateResult = await this.collection.updateOne({ _id: task._id }, {$set: task});
         return result.upsertedCount>0?true:false
     }
 

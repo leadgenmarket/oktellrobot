@@ -19,14 +19,15 @@ export default class TasksService {
         })
     }
 
-    add = async (task: Task) => {
-        let scenario = await this.repository.scenarios.getById(task.scenarioID)
+    add = async (task: Task, statusID: number) => {
+        let scenario = await this.repository.scenarios.getByStatusID(statusID)
 
         //если сценарий не существует, то возвращаем ошибку
         if (scenario == null) {
           Logger.error("error adding new task: unknown scenario")
           return false
         }
+        task.scenarioID = scenario._id.toHexString()
         var taskRes = await this.repository.tasks.add(task)
 
         //создаем задание в буфере, на получение из лида информации для php сервиса.
@@ -66,12 +67,13 @@ export default class TasksService {
     makeCalls = async () => {
       var callsList = await this.repository.tasks.getTasksToCall()
       callsList.forEach(async (task) => {
-        let scenario = await this.repository.scenarios.getById(task.scenarioID)
+        let scenario = await this.repository.scenarios.getById(task.scenarioID!)
         if (scenario) {
           let result = await this.makeCall(this.formatPhone(task.phone!), task.cityName!, this.dashaApi)
           if (result.isAnswered()) {
             //звонок был отвечен
             if (result.isAskedToCallLater()) {
+              console.log("попросил перезвонить позже")
               //попросили перезвонить, перезваниваем через час
               task.tries -= 1 //тут отняли 1, чтобы счетчик кол-ва звонков не увеличился
             } else {
@@ -80,7 +82,7 @@ export default class TasksService {
               task.success = result.isSuccess()
               if (task.success) {
                 //добавляем коммент в лид, что успешно
-                await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario.discardStatus, `Клиент ответил ДА (сценарий - ${scenario.name})`))
+                await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario.successStatus, `Клиент ответил ДА (сценарий - ${scenario.name})`))
               } else {
                 //добавляем коммент в лид, что не успешно
                 await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario.discardStatus, `Клиент ответил НЕТ (сценарий - ${scenario.name})`))
@@ -96,7 +98,7 @@ export default class TasksService {
             task.finished = true
             await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario.callsFinishedStatus, `Не удалось дозвониться, по сценарию ${scenario.name}`))
           }
-          
+          console.log(task)
           await this.repository.tasks.update(task)
         }
       })
@@ -141,7 +143,7 @@ export default class TasksService {
       
       await dashaApi.stop();
 
-      let callResult = new CallResult(result.output.answered == true, result.output.ask_call_later == true, result.output.positive_or_negative == true)
+      let callResult = new CallResult(result.output.answered == true, result.output.positive_or_negative == true, result.output.ask_call_later == true)
       return callResult
     }
 

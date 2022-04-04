@@ -12,20 +12,25 @@ export default class TasksHandlers {
     }
 
     addFromWebHook = async (req: Request, res: Response) => {
-        let scenarioID = req.params.scenarioID
-        console.log(scenarioID)
         let leadID: number = 0
+        let statusID: number = 0
         if (req.body.leads){
             if (req.body.leads.status) {
                 leadID = parseInt(req.body.leads.status[0].id)
+                statusID = parseInt(req.body.leads.status[0].status_id)
             }
 
             if (req.body.leads.add) {
                 leadID = parseInt(req.body.leads.add[0].id)
+                statusID = parseInt(req.body.leads.add[0].status_id)
             }
         }
-        var task = new Task("", leadID, scenarioID)
-        var result = await this.tasks.add(task)
+        if (statusID == 0 || leadID == 0) {
+            res.status(400);
+            res.json({ payload: "error"})
+        }
+        var task = new Task("", leadID)
+        var result = await this.tasks.add(task, statusID)
         if (result) {
             res.json({ payload: "success", id: task._id})
         } else {
@@ -37,32 +42,6 @@ export default class TasksHandlers {
     makeCalls = async (req: Request, res: Response) => {
         let result = await this.tasks.makeCalls()
         res.json({ payload: result})
-    }
-
-    //remove if not neded
-    addTask = async (req: Request, res: Response) => {
-        try{
-            var task = new Task(req.body.id, req.body.leadID, req.body.scenarioID, req.body.phone, req.body.cityName, req.body.tries, req.body.nextCallTime, req.body.success, req.body.finished)
-        } catch (e) {
-            res.status(400);
-            Logger.error(`error parsing body addTask handler`)
-            res.json({ payload: "error parsing body", err: e})
-            return
-        }
-        if (task.validate()!=="") {
-            let msg = "addTask: error in request check "+ task.validate() + " param"
-            Logger.error(msg)
-            res.status(400);
-            res.json({ payload: msg})
-            return
-        }
-        var result = await this.tasks.add(task)
-        if (result) {
-            res.json({ payload: "success", id: task._id})
-        } else {
-            res.status(400);
-            res.json({ payload: "error"})
-        }
     }
 
     deleteTask = async (req: Request, res: Response) => {

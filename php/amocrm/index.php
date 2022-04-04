@@ -25,7 +25,7 @@ foreach($amoBufList as $item) {
       break;
     case 1: 
       //обновляем лид
-      $result = updateLeadInfo($amoClient, $repsoitory, $leadID, $item->newStatus, $item->comment);
+      $result = updateLeadInfo($amoClient, $repsoitory, $item->leadID, $item->newStatus, $item->comment);
       if ($result) {
         //если успешно, то удаляем amoBuf
         $result = $repsoitory->deleteAmoBufTask($item->_id);

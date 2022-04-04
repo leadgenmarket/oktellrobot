@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var mongodb_1 = require("mongodb");
 var Scenario = /** @class */ (function () {
-    function Scenario(id, name, phonesList, maxTries, successStatus, discardStatus, callsFinishedStatus, addDay) {
+    function Scenario(id, name, statusID, phonesList, maxTries, successStatus, discardStatus, callsFinishedStatus, addDay) {
         var _this = this;
         this.validate = function () {
             if (typeof _this._id == 'undefined') {
@@ -10,6 +10,9 @@ var Scenario = /** @class */ (function () {
             }
             if (typeof _this.name !== 'string') {
                 return "name";
+            }
+            if (typeof _this.statusID !== 'number') {
+                return "statusID";
             }
             if (typeof _this.phonesList !== 'object') {
                 return "phonesList";
@@ -42,6 +45,7 @@ var Scenario = /** @class */ (function () {
         this.name = name;
         this.phonesList = phonesList;
         this.maxTries = maxTries;
+        this.statusID = statusID;
         this.successStatus = successStatus;
         this.discardStatus = discardStatus;
         this.callsFinishedStatus = callsFinishedStatus;

@@ -5,12 +5,13 @@ export default class Scenario {
     name: string
     phonesList: string[] //нужно или нет это поле?
     maxTries: number
+    statusID: number
     successStatus: number
     discardStatus: number
     callsFinishedStatus: number
     addDay: boolean
 
-    constructor(id: string, name: string, phonesList: string[], maxTries: number, successStatus: number, discardStatus: number, callsFinishedStatus: number, addDay: boolean) {
+    constructor(id: string, name: string, statusID: number, phonesList: string[], maxTries: number, successStatus: number, discardStatus: number, callsFinishedStatus: number, addDay: boolean) {
         
         if (id !== "") {
             if (ObjectId.isValid(id)){
@@ -22,6 +23,7 @@ export default class Scenario {
         this.name = name
         this.phonesList = phonesList
         this.maxTries = maxTries
+        this.statusID = statusID
         this.successStatus = successStatus
         this.discardStatus = discardStatus
         this.callsFinishedStatus = callsFinishedStatus
@@ -34,6 +36,9 @@ export default class Scenario {
         }
         if (typeof this.name !== 'string') {
             return "name"
+        }
+        if (typeof this.statusID !== 'number') {
+            return "statusID"
         }
         if (typeof this.phonesList !== 'object') {
             return "phonesList"

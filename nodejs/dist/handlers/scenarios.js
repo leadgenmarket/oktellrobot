@@ -51,7 +51,7 @@ var ScenariosHandlers = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         try {
-                            scenario = new scenarios_1.default(req.body.id, req.body.name, req.body.phonesList, req.body.maxTries, req.body.successStatus, req.body.discardStatus, req.body.callsFinishedStatus, req.body.addDay);
+                            scenario = new scenarios_1.default(req.body.id, req.body.name, req.body.statusID, req.body.phonesList, req.body.maxTries, req.body.successStatus, req.body.discardStatus, req.body.callsFinishedStatus, req.body.addDay);
                         }
                         catch (e) {
                             res.status(400);
@@ -86,7 +86,7 @@ var ScenariosHandlers = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         try {
-                            scenario = new scenarios_1.default(req.body.id, req.body.name, req.body.phonesList, req.body.maxTries, req.body.successStatus, req.body.discardStatus, req.body.callsFinishedStatus, req.body.addDay);
+                            scenario = new scenarios_1.default(req.body.id, req.body.name, req.body.statusID, req.body.phonesList, req.body.maxTries, req.body.successStatus, req.body.discardStatus, req.body.callsFinishedStatus, req.body.addDay);
                         }
                         catch (e) {
                             res.status(400);

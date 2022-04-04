@@ -22,8 +22,7 @@ export default class Handlers {
         this.app.get("/scenario", this.scenariosHandlers.getAllScenarios)
 
         //tasks
-        this.app.post('/task/:scenarioID', this.tasksHandlers.addFromWebHook)
-        this.app.put("/task", this.tasksHandlers.addTask)
+        this.app.post('/task', this.tasksHandlers.addFromWebHook)
         this.app.delete("/task/:id", this.tasksHandlers.deleteTask)
         this.app.get("/task", this.tasksHandlers.getAllTasks)
         this.app.get("/task/call", this.tasksHandlers.makeCalls)

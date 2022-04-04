@@ -54,8 +54,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var mongoDB = __importStar(require("mongodb"));
+var tasks_1 = __importDefault(require("../domain/tasks"));
 var TasksRepository = /** @class */ (function () {
     function TasksRepository(db, CollectionName) {
         var _this = this;
@@ -74,7 +78,7 @@ var TasksRepository = /** @class */ (function () {
             var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.collection.updateOne({ _id: task._id }, task)];
+                    case 0: return [4 /*yield*/, this.collection.updateOne({ _id: task._id }, { $set: task })];
                     case 1:
                         result = _a.sent();
                         return [2 /*return*/, result.upsertedCount > 0 ? true : false];
@@ -93,27 +97,40 @@ var TasksRepository = /** @class */ (function () {
             });
         }); };
         this.list = function () { return __awaiter(_this, void 0, void 0, function () {
-            var result;
+            var result, tasks;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.collection.find().toArray()];
                     case 1:
                         result = _a.sent();
-                        return [2 /*return*/, result];
+                        tasks = this.convertListToTaskList(result);
+                        return [2 /*return*/, tasks];
                 }
             });
         }); };
         this.getTasksToCall = function () { return __awaiter(_this, void 0, void 0, function () {
-            var result;
+            var result, tasks;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.collection.find({ phone: { $ne: null }, cityName: { $ne: null }, finished: false }).toArray()];
                     case 1:
                         result = _a.sent();
-                        return [2 /*return*/, result];
+                        tasks = this.convertListToTaskList(result);
+                        return [2 /*return*/, tasks];
                 }
             });
         }); };
+        this.convertDocumentToTask = function (document) {
+            var task = new tasks_1.default(document.id, document.leadID, document.scenarioID, document.phone, document.cityName, document.tries, document.nextCallTime, document.success, document.finished);
+            return task;
+        };
+        this.convertListToTaskList = function (documents) {
+            var tasks = [];
+            documents.forEach(function (document) {
+                tasks.push(_this.convertDocumentToTask(document));
+            });
+            return tasks;
+        };
         this.collection = db.collection(CollectionName);
     }
     return TasksRepository;

@@ -46,23 +46,28 @@ var TasksHandlers = /** @class */ (function () {
     function TasksHandlers(tasks) {
         var _this = this;
         this.addFromWebHook = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-            var scenarioID, leadID, task, result;
+            var leadID, statusID, task, result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        scenarioID = req.params.scenarioID;
-                        console.log(scenarioID);
                         leadID = 0;
+                        statusID = 0;
                         if (req.body.leads) {
                             if (req.body.leads.status) {
                                 leadID = parseInt(req.body.leads.status[0].id);
+                                statusID = parseInt(req.body.leads.status[0].status_id);
                             }
                             if (req.body.leads.add) {
                                 leadID = parseInt(req.body.leads.add[0].id);
+                                statusID = parseInt(req.body.leads.add[0].status_id);
                             }
                         }
-                        task = new tasks_1.default("", leadID, scenarioID);
-                        return [4 /*yield*/, this.tasks.add(task)];
+                        if (statusID == 0 || leadID == 0) {
+                            res.status(400);
+                            res.json({ payload: "error" });
+                        }
+                        task = new tasks_1.default("", leadID);
+                        return [4 /*yield*/, this.tasks.add(task, statusID)];
                     case 1:
                         result = _a.sent();
                         if (result) {
@@ -84,42 +89,6 @@ var TasksHandlers = /** @class */ (function () {
                     case 1:
                         result = _a.sent();
                         res.json({ payload: result });
-                        return [2 /*return*/];
-                }
-            });
-        }); };
-        //remove if not neded
-        this.addTask = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-            var task, msg, result;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        try {
-                            task = new tasks_1.default(req.body.id, req.body.leadID, req.body.scenarioID, req.body.phone, req.body.cityName, req.body.tries, req.body.nextCallTime, req.body.success, req.body.finished);
-                        }
-                        catch (e) {
-                            res.status(400);
-                            logger_1.default.error("error parsing body addTask handler");
-                            res.json({ payload: "error parsing body", err: e });
-                            return [2 /*return*/];
-                        }
-                        if (task.validate() !== "") {
-                            msg = "addTask: error in request check " + task.validate() + " param";
-                            logger_1.default.error(msg);
-                            res.status(400);
-                            res.json({ payload: msg });
-                            return [2 /*return*/];
-                        }
-                        return [4 /*yield*/, this.tasks.add(task)];
-                    case 1:
-                        result = _a.sent();
-                        if (result) {
-                            res.json({ payload: "success", id: task._id });
-                        }
-                        else {
-                            res.status(400);
-                            res.json({ payload: "error" });
-                        }
                         return [2 /*return*/];
                 }
             });

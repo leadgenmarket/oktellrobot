@@ -8,11 +8,11 @@ export default class Task{
     tries: number
     phone?: string
     cityName?:string
-    scenarioID: string
+    scenarioID?: string
     success: boolean
     finished: boolean
 
-    constructor(id: string, leadID: number, scenarioID: string, phone?: string, cityName?:string, tries?: number, nextCallTime?: number, success?: boolean, finished?: boolean){
+    constructor(id: string, leadID: number, scenarioID?: string, phone?: string, cityName?:string, tries?: number, nextCallTime?: number, success?: boolean, finished?: boolean){
         if (id !== "") {
             if (ObjectId.isValid(id)){
                 this._id = new ObjectId(id)

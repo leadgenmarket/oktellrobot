@@ -47,7 +47,7 @@ class LeadgenAmoClient {
               ->setAccountBaseDomain($baseDomain)
               ->onAccessTokenRefresh(
                 function (AccessTokenInterface $accessToken, string $baseDomain) {
-                  saveToken(
+                  $this->saveToken(
                     [
                       'accessToken' => $accessToken->getToken(),
                       'refreshToken' => $accessToken->getRefreshToken(),
@@ -62,7 +62,7 @@ class LeadgenAmoClient {
               try {
                 $accessToken = $apiClient->getOAuthClient()->getAccessTokenByRefreshToken($accessToken);
                 
-                saveToken([
+                $this->saveToken([
                   'accessToken' => $accessToken->getToken(),
                   'refreshToken' => $accessToken->getRefreshToken(),
                   'expires' => $accessToken->getExpires(),
