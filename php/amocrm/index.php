@@ -25,6 +25,14 @@ foreach($amoBufList as $item) {
       break;
     case 1: 
       //обновляем лид
+      $result = updateLeadInfo($amoClient, $repsoitory, $leadID, $item->newStatus, $item->comment);
+      if ($result) {
+        //если успешно, то удаляем amoBuf
+        $result = $repsoitory->deleteAmoBufTask($item->_id);
+        if ($result) {
+          var_dump('task successfully done');
+        }
+      }
       break;
     case 2:
       //получаем инфу о лиде из crm и обновлем в таске
@@ -38,6 +46,20 @@ foreach($amoBufList as $item) {
       }
       break;
   }
+}
+
+function updateLeadInfo(LeadgenAmoClient $amoClient, Repository $repsoitory, int $leadID, int $newStatus, string $comment) {
+  $lead = $amoClient->getLeadById($leadID);
+  if ($lead == null) {
+    return false;
+  }
+  if ($newStatus) {
+    $amoClient->updateLeadStatus($lead, $newStatus);
+  }
+  if ($comment){
+    $amoClient->addCommentToLead($lead, $comment);
+  }
+  return true;
 }
 
 function getLeadInfoFromAmoAndUpdateTask(LeadgenAmoClient $amoClient, Repository $repsoitory, int $leadID, string $taskID){
