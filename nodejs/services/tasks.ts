@@ -7,6 +7,7 @@ import Logger from "../utils/logger";
 const fs = require('fs');
 import AudioResources from "../utils/customTts"
 import CallResult from "../domain/callResult";
+import checkTime from "../utils/checkTime";
 
 export default class TasksService {
     repository: Repositories
@@ -93,6 +94,7 @@ export default class TasksService {
           task.tries += 1
           //если попросили перезвонить, то следующий звонок делаем через 2 часа (можно ли определять что занято?) 
           task.nextCallTime = result.isAskedToCallLater()?this.nowPlusHour():this.nowPlus2Hours()
+          task.nextCallTime = checkTime(task.nextCallTime)
           //если кол-во звонков, больше кол-ва максимума в сценарии, то закрываем таску
           if (task.tries>=scenario.maxTries && !task.finished) {
             task.finished = true
