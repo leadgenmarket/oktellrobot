@@ -6,7 +6,6 @@ import * as mongoDB from "mongodb"
 import Services from './services/services';
 import Repositories from './repository/repositories';
 import Handlers from './handlers/handlers';
-import { time } from 'console';
 
 dotenv.config();
 
