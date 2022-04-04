@@ -11,6 +11,6 @@ export default class Services {
     }
 
     dispose = () => {
-        this.tasks.dashaApi.dispose()
+        this.tasks.dashaApi?.dispose()
     }
 }

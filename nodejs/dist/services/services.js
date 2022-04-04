@@ -9,7 +9,8 @@ var Services = /** @class */ (function () {
     function Services(repos) {
         var _this = this;
         this.dispose = function () {
-            _this.tasks.dashaApi.dispose();
+            var _a;
+            (_a = _this.tasks.dashaApi) === null || _a === void 0 ? void 0 : _a.dispose();
         };
         this.scenarios = new scenarios_1.default(repos.scenarios);
         this.tasks = new tasks_1.default(repos);

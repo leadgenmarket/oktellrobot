@@ -68,6 +68,7 @@ var checkTime_1 = __importDefault(require("../utils/checkTime"));
 var TasksService = /** @class */ (function () {
     function TasksService(repo) {
         var _this = this;
+        this.dashaApi = null;
         this.add = function (task, statusID) { return __awaiter(_this, void 0, void 0, function () {
             var scenario, taskRes, buf, amoBufRes;
             return __generator(this, function (_a) {
@@ -145,7 +146,12 @@ var TasksService = /** @class */ (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.repository.tasks.getTasksToCall()];
+                    case 0:
+                        if (this.dashaApi == null) {
+                            console.log("not initialized yet");
+                            return [2 /*return*/, false];
+                        }
+                        return [4 /*yield*/, this.repository.tasks.getTasksToCall()];
                     case 1:
                         callsList = _a.sent();
                         callsList.forEach(function (task) { return __awaiter(_this, void 0, void 0, function () {
