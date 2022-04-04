@@ -32,7 +32,10 @@ foreach($amoBufList as $item) {
         if ($result) {
           var_dump('task successfully done');
         }
-      }
+      } else {
+        //добавить логирование ошибки
+        var_dump('failed');
+      };
       break;
     case 2:
       //получаем инфу о лиде из crm и обновлем в таске
@@ -43,7 +46,10 @@ foreach($amoBufList as $item) {
         if ($result) {
           var_dump('task successfully done');
         }
-      }
+      } else {
+        //добавить логирование ошибки
+        var_dump('failed get info');
+      };
       break;
   }
 }
@@ -73,6 +79,10 @@ function getLeadInfoFromAmoAndUpdateTask(LeadgenAmoClient $amoClient, Repository
   }
   $phone = $amoClient->getLeadsPhoneNumber($lead);
   $city = $amoClient->getLeadsCity($lead);
+  var_dump($city=="");
+  if ($city==""){
+    return false;
+  }
   $task->phone = $phone;
   $task->cityName = $city;
   $result = $repsoitory->updateTask($task);

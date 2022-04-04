@@ -15,7 +15,7 @@ export default class TasksRepository {
 
     update = async (task: Task) => {
         const result: mongoDB.UpdateResult = await this.collection.updateOne({ _id: task._id }, {$set: task});
-        return result.upsertedCount>0?true:false
+        return result.modifiedCount>0?true:false
     }
 
     delete = async (id: string) => {
@@ -36,7 +36,7 @@ export default class TasksRepository {
     }
 
     convertDocumentToTask = (document: mongoDB.Document): Task =>{
-        let task = new Task(document.id, document.leadID, document.scenarioID, document.phone, document.cityName, document.tries, document.nextCallTime, document.success, document.finished)
+        let task = new Task(document._id, document.leadID, document.scenarioID, document.phone, document.cityName, document.tries, document.nextCallTime, document.success, document.finished)
         return task
     }
 

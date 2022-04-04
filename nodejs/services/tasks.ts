@@ -98,7 +98,7 @@ export default class TasksService {
             task.finished = true
             await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario.callsFinishedStatus, `Не удалось дозвониться, по сценарию ${scenario.name}`))
           }
-          console.log(task)
+          
           await this.repository.tasks.update(task)
         }
       })
@@ -148,7 +148,7 @@ export default class TasksService {
     }
 
     protected nowPlusHour = ():number => {
-      let time  = new Date().getTime()
+      let time  = Math.floor(Date.now() / 1000)
       time += 3600
       return time
     }

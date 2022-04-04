@@ -81,7 +81,7 @@ var TasksRepository = /** @class */ (function () {
                     case 0: return [4 /*yield*/, this.collection.updateOne({ _id: task._id }, { $set: task })];
                     case 1:
                         result = _a.sent();
-                        return [2 /*return*/, result.upsertedCount > 0 ? true : false];
+                        return [2 /*return*/, result.modifiedCount > 0 ? true : false];
                 }
             });
         }); };
@@ -121,7 +121,7 @@ var TasksRepository = /** @class */ (function () {
             });
         }); };
         this.convertDocumentToTask = function (document) {
-            var task = new tasks_1.default(document.id, document.leadID, document.scenarioID, document.phone, document.cityName, document.tries, document.nextCallTime, document.success, document.finished);
+            var task = new tasks_1.default(document._id, document.leadID, document.scenarioID, document.phone, document.cityName, document.tries, document.nextCallTime, document.success, document.finished);
             return task;
         };
         this.convertListToTaskList = function (documents) {

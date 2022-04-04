@@ -154,7 +154,7 @@ var TasksService = /** @class */ (function () {
                     case 1:
                         callsList = _a.sent();
                         callsList.forEach(function (task) { return __awaiter(_this, void 0, void 0, function () {
-                            var scenario, result;
+                            var scenario, result, resUpd;
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
                                     case 0: return [4 /*yield*/, this.repository.scenarios.getById(task.scenarioID)];
@@ -176,7 +176,7 @@ var TasksService = /** @class */ (function () {
                                         task.success = result.isSuccess();
                                         if (!task.success) return [3 /*break*/, 5];
                                         //добавляем коммент в лид, что успешно
-                                        return [4 /*yield*/, this.repository.amoBuffer.add(new amoBuf_1.default("", 1, task.leadID, "", task.phone, scenario.discardStatus, "\u041A\u043B\u0438\u0435\u043D\u0442 \u043E\u0442\u0432\u0435\u0442\u0438\u043B \u0414\u0410 (\u0441\u0446\u0435\u043D\u0430\u0440\u0438\u0439 - " + scenario.name + ")"))];
+                                        return [4 /*yield*/, this.repository.amoBuffer.add(new amoBuf_1.default("", 1, task.leadID, "", task.phone, scenario.successStatus, "\u041A\u043B\u0438\u0435\u043D\u0442 \u043E\u0442\u0432\u0435\u0442\u0438\u043B \u0414\u0410 (\u0441\u0446\u0435\u043D\u0430\u0440\u0438\u0439 - " + scenario.name + ")"))];
                                     case 4:
                                         //добавляем коммент в лид, что успешно
                                         _a.sent();
@@ -203,7 +203,8 @@ var TasksService = /** @class */ (function () {
                                         console.log(task);
                                         return [4 /*yield*/, this.repository.tasks.update(task)];
                                     case 10:
-                                        _a.sent();
+                                        resUpd = _a.sent();
+                                        console.log(resUpd);
                                         _a.label = 11;
                                     case 11: return [2 /*return*/];
                                 }
@@ -225,7 +226,7 @@ var TasksService = /** @class */ (function () {
         };
         this.nowPlusHour = function () {
             var time = new Date().getTime();
-            time += 3600;
+            time += 3600000;
             return time;
         };
         this.repository = repo;

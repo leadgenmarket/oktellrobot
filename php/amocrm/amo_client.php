@@ -133,14 +133,13 @@ class LeadgenAmoClient {
     //функция возвращает город из лида
     public function getLeadsCity(AmoCRM\Models\LeadModel $lead): string
     {
-      $customFields = $lead->getCustomFieldsValues();
       try {
+        $customFields = $lead->getCustomFieldsValues();
         $city = $customFields->getBy('fieldId', 416699)->getValues()[0]->getValue();
         return $city;
-      } catch (AmoCRMApiException $e) {
-        return null;
+      } catch (\Throwable $e) {
+        return "";
       }
-      
     }
 
     //ищет лиды в заданом статусе
@@ -157,7 +156,6 @@ class LeadgenAmoClient {
         $leads = $this->apiClient->leads()->get($filter, [LeadModel::IS_PRICE_BY_ROBOT, LeadModel::LOSS_REASON, LeadModel::CONTACTS]);
       } catch (AmoCRMApiException $e) {
         printError($e);
-        die;
       }
       return $leads;
     }
