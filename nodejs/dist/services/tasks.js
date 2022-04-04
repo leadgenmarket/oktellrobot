@@ -107,12 +107,6 @@ var TasksService = /** @class */ (function () {
                 }
             });
         }); };
-        this.test = function (city) { return __awaiter(_this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                this.makeCall("+79627681333", city, this.dashaApi);
-                return [2 /*return*/];
-            });
-        }); };
         this.update = function (task) { return __awaiter(_this, void 0, void 0, function () {
             var result;
             return __generator(this, function (_a) {

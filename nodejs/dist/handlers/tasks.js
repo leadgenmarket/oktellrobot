@@ -131,17 +131,6 @@ var TasksHandlers = /** @class */ (function () {
                 }
             });
         }); };
-        this.test = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.tasks.test(req.body.city)];
-                    case 1:
-                        _a.sent();
-                        res.json({ payload: "ok" });
-                        return [2 /*return*/];
-                }
-            });
-        }); };
         this.tasks = tasks;
     }
     return TasksHandlers;
