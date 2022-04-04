@@ -8,7 +8,7 @@ context
 digression dont_understand_hangup_params
 {
     conditions { on false; }
-    var responses: Phrases[] = ["dont_understand_forward"];
+    var responses: Phrases[] = ["dont_understand_hangup"];
     var status = "DontUnderstandHangup";
     var serviceStatus = "Done";
     do
@@ -22,7 +22,7 @@ digression dont_understand_hangup_params
 digression dont_understand
 {
     conditions { on true priority -1000; }
-    var retriesLimit=0;
+    var retriesLimit=1;
     var counter=0;
     var resetOnRecognized=false;
     var responses: Phrases[] = ["dont_understand"];
@@ -38,7 +38,7 @@ digression dont_understand
         {
             #say(item, repeatMode: "ignore");
         }
-        #repeat(accuracy: "short");
+       // #repeat(accuracy: "short");
         return;
     }
     transitions

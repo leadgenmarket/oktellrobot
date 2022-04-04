@@ -27,5 +27,6 @@ export default class Handlers {
         this.app.delete("/task/:id", this.tasksHandlers.deleteTask)
         this.app.get("/task", this.tasksHandlers.getAllTasks)
         this.app.get("/task/call", this.tasksHandlers.makeCalls)
+        this.app.get("/task/test", this.tasksHandlers.test)
     }
 }

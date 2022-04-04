@@ -20,6 +20,7 @@ var Handlers = /** @class */ (function () {
             _this.app.delete("/task/:id", _this.tasksHandlers.deleteTask);
             _this.app.get("/task", _this.tasksHandlers.getAllTasks);
             _this.app.get("/task/call", _this.tasksHandlers.makeCalls);
+            _this.app.get("/task/test", _this.tasksHandlers.test);
         };
         this.app = app;
         this.scenariosHandlers = new scenarios_1.default(services.scenarios);

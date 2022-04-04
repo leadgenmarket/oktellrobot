@@ -5,6 +5,7 @@ import Repositories from "../repository/repositories";
 import AmoBuffer from "../domain/amoBuf";
 import Logger from "../utils/logger";
 const fs = require('fs');
+import AudioResources from "../utils/customTts"
 
 export default class TasksService {
     repository: Repositories
@@ -42,6 +43,10 @@ export default class TasksService {
         }
     }
 
+    test = async (city:string) => {
+      this.makeCall("+79627681333", city, this.dashaApi)
+    }
+
     update = async (task: Task) => {
         var result = await this.repository.tasks.update(task)
         return result
@@ -61,7 +66,9 @@ export default class TasksService {
       var callsList = await this.repository.tasks.getTasksToCall()
       callsList.forEach(async (task) => {
         let scenario = await this.repository.scenarios.getById(task.scenarioID)
-        await this.makeCall(this.formatPhone(task.phone), this.dashaApi)
+        if (scenario) {
+          await this.makeCall(this.formatPhone(task.phone), task.city, this.dashaApi)
+        }
       })
       return true
     }
@@ -77,16 +84,30 @@ export default class TasksService {
     }
 
     //функция для совершения звонка
-    protected async makeCall(phone: string, dashaApi: dasha.Application<Record<string, unknown>, Record<string, unknown>>) {
+    protected async makeCall(phone: string, city:string, dashaApi: dasha.Application<Record<string, unknown>, Record<string, unknown>>) {
+       
         let intents: string[] = [];
-        dashaApi.connectionProvider = async (conv: any) =>
-          conv.input.phone === 'chat'
+        
+        const audio = new AudioResources();
+        audio.addFolder("audio");
+        
+        dashaApi.ttsDispatcher = (conv) => "custom";
+        dashaApi.customTtsProvider = async (text, voice) => {
+          console.log(`Tts asking for phrase with text ${text} and voice ${JSON.stringify(voice)}`);
+          const fname = audio.GetPath(text, voice);
+
+          console.log(`Found in file ${fname}`);
+          return dasha.audio.fromFile(fname);
+        };
+
+        dashaApi.connectionProvider = async (conv) =>
+          conv.input.phone === "chat"
             ? dasha.chat.connect(await dasha.chat.createConsoleChat())
-            : dasha.sip.connect(new dasha.sip.Endpoint('default'));
+            : dasha.sip.connect(new dasha.sip.Endpoint("default"));
       
-        await dashaApi.start();
+        await dashaApi.start({concurrency:10});
       
-        const conv = dashaApi.createConversation({ phone: phone });
+        const conv = dashaApi.createConversation({ phone: phone, city:city });
       
         if (conv.input.phone !== 'chat') conv.on('transcription', console.log);
       

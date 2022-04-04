@@ -62,6 +62,7 @@ var dasha = __importStar(require("@dasha.ai/sdk"));
 var amoBuf_1 = __importDefault(require("../domain/amoBuf"));
 var logger_1 = __importDefault(require("../utils/logger"));
 var fs = require('fs');
+var customTts_1 = __importDefault(require("../utils/customTts"));
 var TasksService = /** @class */ (function () {
     function TasksService(repo) {
         var _this = this;
@@ -101,6 +102,12 @@ var TasksService = /** @class */ (function () {
                         _a.label = 4;
                     case 4: return [2 /*return*/];
                 }
+            });
+        }); };
+        this.test = function (city) { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                this.makeCall("+79627681333", city, this.dashaApi);
+                return [2 /*return*/];
             });
         }); };
         this.update = function (task) { return __awaiter(_this, void 0, void 0, function () {
@@ -151,12 +158,12 @@ var TasksService = /** @class */ (function () {
                                     case 0: return [4 /*yield*/, this.repository.scenarios.getById(task.scenarioID)];
                                     case 1:
                                         scenario = _a.sent();
-                                        console.log(scenario);
-                                        console.log(task);
-                                        return [4 /*yield*/, this.makeCall(this.formatPhone(task.phone), this.dashaApi)];
+                                        if (!scenario) return [3 /*break*/, 3];
+                                        return [4 /*yield*/, this.makeCall(this.formatPhone(task.phone), task.city, this.dashaApi)];
                                     case 2:
                                         _a.sent();
-                                        return [2 /*return*/];
+                                        _a.label = 3;
+                                    case 3: return [2 /*return*/];
                                 }
                             });
                         }); });
@@ -180,36 +187,48 @@ var TasksService = /** @class */ (function () {
         });
     }
     //функция для совершения звонка
-    TasksService.prototype.makeCall = function (phone, dashaApi) {
+    TasksService.prototype.makeCall = function (phone, city, dashaApi) {
         return __awaiter(this, void 0, void 0, function () {
-            var intents, conv, logFile, result;
+            var intents, audio, conv, logFile, result;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         intents = [];
+                        audio = new customTts_1.default();
+                        audio.addFolder("audio");
+                        dashaApi.ttsDispatcher = function (conv) { return "custom"; };
+                        dashaApi.customTtsProvider = function (text, voice) { return __awaiter(_this, void 0, void 0, function () {
+                            var fname;
+                            return __generator(this, function (_a) {
+                                console.log("Tts asking for phrase with text " + text + " and voice " + JSON.stringify(voice));
+                                fname = audio.GetPath(text, voice);
+                                console.log("Found in file " + fname);
+                                return [2 /*return*/, dasha.audio.fromFile(fname)];
+                            });
+                        }); };
                         dashaApi.connectionProvider = function (conv) { return __awaiter(_this, void 0, void 0, function () {
                             var _a, _b, _c;
                             return __generator(this, function (_d) {
                                 switch (_d.label) {
                                     case 0:
-                                        if (!(conv.input.phone === 'chat')) return [3 /*break*/, 2];
+                                        if (!(conv.input.phone === "chat")) return [3 /*break*/, 2];
                                         _c = (_b = dasha.chat).connect;
                                         return [4 /*yield*/, dasha.chat.createConsoleChat()];
                                     case 1:
                                         _a = _c.apply(_b, [_d.sent()]);
                                         return [3 /*break*/, 3];
                                     case 2:
-                                        _a = dasha.sip.connect(new dasha.sip.Endpoint('default'));
+                                        _a = dasha.sip.connect(new dasha.sip.Endpoint("default"));
                                         _d.label = 3;
                                     case 3: return [2 /*return*/, _a];
                                 }
                             });
                         }); };
-                        return [4 /*yield*/, dashaApi.start()];
+                        return [4 /*yield*/, dashaApi.start({ concurrency: 10 })];
                     case 1:
                         _a.sent();
-                        conv = dashaApi.createConversation({ phone: phone });
+                        conv = dashaApi.createConversation({ phone: phone, city: city });
                         if (conv.input.phone !== 'chat')
                             conv.on('transcription', console.log);
                         return [4 /*yield*/, fs.promises.open('./log.txt', 'w')];

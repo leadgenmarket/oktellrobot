@@ -86,4 +86,9 @@ export default class TasksHandlers {
         var result = await this.tasks.list()
         res.json({ payload: result})
     }
+
+    test = async (req: Request, res: Response) => {
+        await this.tasks.test(req.body.city)
+        res.json({ payload: "ok"})
+    }
 }
