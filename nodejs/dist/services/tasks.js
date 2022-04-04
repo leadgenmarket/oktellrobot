@@ -64,6 +64,7 @@ var logger_1 = __importDefault(require("../utils/logger"));
 var fs = require('fs');
 var customTts_1 = __importDefault(require("../utils/customTts"));
 var callResult_1 = __importDefault(require("../domain/callResult"));
+var checkTime_1 = __importDefault(require("../utils/checkTime"));
 var TasksService = /** @class */ (function () {
     function TasksService(repo) {
         var _this = this;
@@ -191,8 +192,9 @@ var TasksService = /** @class */ (function () {
                                     case 7:
                                         //увеличиваем счетчик звонков
                                         task.tries += 1;
-                                        //следующий звонок через час, если нужен
-                                        task.nextCallTime = this.nowPlusHour();
+                                        //если попросили перезвонить, то следующий звонок делаем через 2 часа (можно ли определять что занято?) 
+                                        task.nextCallTime = result.isAskedToCallLater() ? this.nowPlusHour() : this.nowPlus2Hours();
+                                        task.nextCallTime = checkTime_1.default(task.nextCallTime);
                                         if (!(task.tries >= scenario.maxTries && !task.finished)) return [3 /*break*/, 9];
                                         task.finished = true;
                                         return [4 /*yield*/, this.repository.amoBuffer.add(new amoBuf_1.default("", 1, task.leadID, "", task.phone, scenario.callsFinishedStatus, "\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0434\u043E\u0437\u0432\u043E\u043D\u0438\u0442\u044C\u0441\u044F, \u043F\u043E \u0441\u0446\u0435\u043D\u0430\u0440\u0438\u044E " + scenario.name))];
@@ -224,6 +226,16 @@ var TasksService = /** @class */ (function () {
         this.nowPlusHour = function () {
             var time = Math.floor(Date.now() / 1000);
             time += 3600;
+            return time;
+        };
+        this.nowPlus2Hours = function () {
+            var time = Math.floor(Date.now() / 1000);
+            time += 7200;
+            return time;
+        };
+        this.nowPlus30Minutes = function () {
+            var time = Math.floor(Date.now() / 1000);
+            time += 1800;
             return time;
         };
         this.repository = repo;

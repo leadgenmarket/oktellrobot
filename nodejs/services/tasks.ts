@@ -46,10 +46,6 @@ export default class TasksService {
         }
     }
 
-    test = async (city:string) => {
-      this.makeCall("+79627681333", city, this.dashaApi)
-    }
-
     update = async (task: Task) => {
         var result = await this.repository.tasks.update(task)
         return result
