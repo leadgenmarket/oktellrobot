@@ -5,5 +5,4 @@ token_info.json
 logs
 .DS_Store
 nodejs/log.txt
-nodejs/dist
 node_modules
