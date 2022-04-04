@@ -1,4 +1,5 @@
 import {ObjectId} from "mongodb";
+import checkTime from "../utils/checkTime";
 
 //надо добавить название города
 export default class Task{
@@ -22,7 +23,7 @@ export default class Task{
         }
         this.leadID = leadID
         this.phone = phone
-        this.nextCallTime = nextCallTime?nextCallTime:Math.floor(Date.now() / 1000)
+        this.nextCallTime = nextCallTime?nextCallTime:checkTime(Math.floor(Date.now() / 1000))
         this.tries = tries?tries:0
         this.cityName = cityName
         this.scenarioID = scenarioID
