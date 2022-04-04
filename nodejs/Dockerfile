@@ -18,4 +18,7 @@ COPY ./audio ./audio
 COPY ./dist .
 
 EXPOSE 8080
+# Actual timezone env variable set
+ENV TZ Europe/Moscow
+
 CMD [ "node", "index.js" ]
