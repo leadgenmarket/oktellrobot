@@ -189,12 +189,11 @@ var TasksService = /** @class */ (function () {
     //функция для совершения звонка
     TasksService.prototype.makeCall = function (phone, city, dashaApi) {
         return __awaiter(this, void 0, void 0, function () {
-            var intents, audio, conv, logFile, result;
+            var audio, conv, result;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        intents = [];
                         audio = new customTts_1.default();
                         audio.addFolder("audio");
                         dashaApi.ttsDispatcher = function (conv) { return "custom"; };
@@ -231,66 +230,26 @@ var TasksService = /** @class */ (function () {
                         conv = dashaApi.createConversation({ phone: phone, city: city });
                         if (conv.input.phone !== 'chat')
                             conv.on('transcription', console.log);
-                        return [4 /*yield*/, fs.promises.open('./log.txt', 'w')];
-                    case 2:
-                        logFile = _a.sent();
-                        return [4 /*yield*/, logFile.appendFile('#'.repeat(100) + '\n')];
-                    case 3:
-                        _a.sent();
-                        conv.on('transcription', function (entry) { return __awaiter(_this, void 0, void 0, function () {
-                            return __generator(this, function (_a) {
-                                switch (_a.label) {
-                                    case 0:
-                                        if (entry.speaker == "human") {
-                                            console.log(entry);
-                                            console.log(entry.text);
-                                        }
-                                        return [4 /*yield*/, logFile.appendFile(entry.speaker + ": " + entry.text + "\n")];
-                                    case 1:
-                                        _a.sent();
-                                        return [2 /*return*/];
-                                }
-                            });
-                        }); });
-                        conv.on('debugLog', function (event) { return __awaiter(_this, void 0, void 0, function () {
-                            var logEntry;
-                            var _a, _b, _c, _d, _e, _f, _g;
-                            return __generator(this, function (_h) {
-                                switch (_h.label) {
-                                    case 0:
-                                        if (!(((_a = event === null || event === void 0 ? void 0 : event.msg) === null || _a === void 0 ? void 0 : _a.msgId) === 'RecognizedSpeechMessage')) return [3 /*break*/, 2];
-                                        if ((_c = (_b = event === null || event === void 0 ? void 0 : event.msg) === null || _b === void 0 ? void 0 : _b.results[0]) === null || _c === void 0 ? void 0 : _c.facts) {
-                                            (_e = (_d = event === null || event === void 0 ? void 0 : event.msg) === null || _d === void 0 ? void 0 : _d.results[0]) === null || _e === void 0 ? void 0 : _e.facts.forEach(function (fact) {
-                                                if (fact.intent) {
-                                                    intents.push(fact.intent);
-                                                }
-                                            });
-                                        }
-                                        logEntry = (_g = (_f = event === null || event === void 0 ? void 0 : event.msg) === null || _f === void 0 ? void 0 : _f.results[0]) === null || _g === void 0 ? void 0 : _g.facts;
-                                        return [4 /*yield*/, logFile.appendFile(JSON.stringify(logEntry, undefined, 2) + '\n')];
-                                    case 1:
-                                        _h.sent();
-                                        _h.label = 2;
-                                    case 2: return [2 /*return*/];
-                                }
-                            });
-                        }); });
                         return [4 /*yield*/, conv.execute()];
-                    case 4:
+                    case 2:
                         result = _a.sent();
-                        console.log(result.output);
-                        if (result.output.serviceStatus == "Done") {
-                            console.log("звонок совершен");
-                            console.log(intents);
+                        if (result.output.hangup == true) {
+                            console.log("дозвонились");
+                            if (result.output.ask_call_later) {
+                                console.log("попросли перезвонить позже");
+                            }
+                            else if (result.output.positive_or_negative) {
+                                console.log("ответил да");
+                            }
+                            else {
+                                console.log("ответил нет");
+                            }
                         }
                         else {
-                            console.log("не дозвон");
+                            console.log("не дозвонились");
                         }
                         return [4 /*yield*/, dashaApi.stop()];
-                    case 5:
-                        _a.sent();
-                        return [4 /*yield*/, logFile.close()];
-                    case 6:
+                    case 3:
                         _a.sent();
                         return [2 /*return*/];
                 }

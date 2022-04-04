@@ -6,6 +6,7 @@ import AmoBuffer from "../domain/amoBuf";
 import Logger from "../utils/logger";
 const fs = require('fs');
 import AudioResources from "../utils/customTts"
+import CallResult from "../domain/callResult";
 
 export default class TasksService {
     repository: Repositories
@@ -67,7 +68,36 @@ export default class TasksService {
       callsList.forEach(async (task) => {
         let scenario = await this.repository.scenarios.getById(task.scenarioID)
         if (scenario) {
-          await this.makeCall(this.formatPhone(task.phone), task.city, this.dashaApi)
+          let result = await this.makeCall(this.formatPhone(task.phone!), task.cityName!, this.dashaApi)
+          if (result.isAnswered()) {
+            //звонок был отвечен
+            if (result.isAskedToCallLater()) {
+              //попросили перезвонить, перезваниваем через час
+              task.tries -= 1 //тут отняли 1, чтобы счетчик кол-ва звонков не увеличился
+            } else {
+              //получили результат, закрываем звонки
+              task.finished = true
+              task.success = result.isSuccess()
+              if (task.success) {
+                //добавляем коммент в лид, что успешно
+                await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario.discardStatus, `Клиент ответил ДА (сценарий - ${scenario.name})`))
+              } else {
+                //добавляем коммент в лид, что не успешно
+                await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario.discardStatus, `Клиент ответил НЕТ (сценарий - ${scenario.name})`))
+              }
+            }
+          }
+          //увеличиваем счетчик звонков
+          task.tries += 1
+          //следующий звонок через час, если нужен
+          task.nextCallTime = this.nowPlusHour()
+          //если кол-во звонков, больше кол-ва максимума в сценарии, то закрываем таску
+          if (task.tries>=scenario.maxTries && !task.finished) {
+            task.finished = true
+            await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario.callsFinishedStatus, `Не удалось дозвониться, по сценарию ${scenario.name}`))
+          }
+          
+          await this.repository.tasks.update(task)
         }
       })
       return true
@@ -84,70 +114,40 @@ export default class TasksService {
     }
 
     //функция для совершения звонка
-    protected async makeCall(phone: string, city:string, dashaApi: dasha.Application<Record<string, unknown>, Record<string, unknown>>) {
-       
-        let intents: string[] = [];
-        
-        const audio = new AudioResources();
-        audio.addFolder("audio");
-        
-        dashaApi.ttsDispatcher = (conv) => "custom";
-        dashaApi.customTtsProvider = async (text, voice) => {
-          console.log(`Tts asking for phrase with text ${text} and voice ${JSON.stringify(voice)}`);
-          const fname = audio.GetPath(text, voice);
+    protected async makeCall(phone: string, city:string, dashaApi: dasha.Application<Record<string, unknown>, Record<string, unknown>>):Promise<CallResult> {
+      const audio = new AudioResources();
+      audio.addFolder("audio");
+      
+      dashaApi.ttsDispatcher = (conv) => "custom";
+      dashaApi.customTtsProvider = async (text, voice) => {
+        console.log(`Tts asking for phrase with text ${text} and voice ${JSON.stringify(voice)}`);
+        const fname = audio.GetPath(text, voice);
 
-          console.log(`Found in file ${fname}`);
-          return dasha.audio.fromFile(fname);
-        };
+        console.log(`Found in file ${fname}`);
+        return dasha.audio.fromFile(fname);
+      };
 
-        dashaApi.connectionProvider = async (conv) =>
-          conv.input.phone === "chat"
-            ? dasha.chat.connect(await dasha.chat.createConsoleChat())
-            : dasha.sip.connect(new dasha.sip.Endpoint("default"));
+      dashaApi.connectionProvider = async (conv) =>
+        conv.input.phone === "chat"
+          ? dasha.chat.connect(await dasha.chat.createConsoleChat())
+          : dasha.sip.connect(new dasha.sip.Endpoint("default"));
+    
+      await dashaApi.start({concurrency:10});
+    
+      const conv = dashaApi.createConversation({ phone: phone, city:city });
+    
+      if (conv.input.phone !== 'chat') conv.on('transcription', console.log);
+      const result = await conv.execute();
       
-        await dashaApi.start({concurrency:10});
-      
-        const conv = dashaApi.createConversation({ phone: phone, city:city });
-      
-        if (conv.input.phone !== 'chat') conv.on('transcription', console.log);
-      
-        const logFile = await fs.promises.open('./log.txt', 'w');
-        await logFile.appendFile('#'.repeat(100) + '\n');
-      
-        conv.on('transcription', async (entry: any) => {
-          if (entry.speaker == "human") {
-            console.log(entry)
-            console.log(entry.text)
-          }
-          await logFile.appendFile(`${entry.speaker}: ${entry.text}\n`);
-        });
-      
-        conv.on('debugLog', async (event: any) => {
-          if (event?.msg?.msgId === 'RecognizedSpeechMessage') {
-            if (event?.msg?.results[0]?.facts) {
-              event?.msg?.results[0]?.facts.forEach((fact:any) => {
-                if (fact.intent) {
-                  intents.push(fact.intent)
-                }
-              });
-            }
-            const logEntry = event?.msg?.results[0]?.facts;
-            await logFile.appendFile(JSON.stringify(logEntry, undefined, 2) + '\n');
-          }
-        });
-      
-        const result = await conv.execute();
-      
-        console.log(result.output);
-        if (result.output.serviceStatus == "Done") {
-          console.log("звонок совершен")
-          console.log(intents);
-        } else {
-          console.log("не дозвон")
-        }
-      
-        await dashaApi.stop();
-      
-        await logFile.close();
+      await dashaApi.stop();
+
+      let callResult = new CallResult(result.output.answered == true, result.output.ask_call_later == true, result.output.positive_or_negative == true)
+      return callResult
+    }
+
+    protected nowPlusHour = ():number => {
+      let time  = new Date().getTime()
+      time += 3600
+      return time
     }
 }

@@ -22,6 +22,7 @@ digression i_will_call_back
         set $serviceStatus=digression.i_will_call_back.serviceStatus;
         set $status=digression.i_will_call_back.status;
         set $callBackDetails = #message.originalText;
+        set $ask_call_later=true;
         #disconnect();
         exit;
     }

@@ -23,13 +23,28 @@ export default class TasksRepository {
         return result.deletedCount>0?true:false
     }
 
-    list = async () => {
+    list = async () : Promise<Task[]> => {
         const result: mongoDB.WithId<mongoDB.Document>[] = await this.collection.find().toArray()
-        return result
+        let tasks = this.convertListToTaskList(result)
+        return tasks
     }
 
-    getTasksToCall = async () => {
+    getTasksToCall = async (): Promise<Task[]> => {
         const result: mongoDB.WithId<mongoDB.Document>[] = await this.collection.find({phone: { $ne: null }, cityName: { $ne: null }, finished: false}).toArray()
-        return result
+        let tasks = this.convertListToTaskList(result)
+        return tasks
+    }
+
+    convertDocumentToTask = (document: mongoDB.Document): Task =>{
+        let task = new Task(document.id, document.leadID, document.scenarioID, document.phone, document.cityName, document.tries, document.nextCallTime, document.success, document.finished)
+        return task
+    }
+
+    convertListToTaskList = (documents: mongoDB.Document[]): Task[] => {
+        let tasks: Task[] = []
+        documents.forEach((document) => {
+            tasks.push(this.convertDocumentToTask(document))
+        })
+        return tasks
     }
 }
