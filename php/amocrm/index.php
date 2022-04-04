@@ -79,7 +79,6 @@ function getLeadInfoFromAmoAndUpdateTask(LeadgenAmoClient $amoClient, Repository
   }
   $phone = $amoClient->getLeadsPhoneNumber($lead);
   $city = $amoClient->getLeadsCity($lead);
-  var_dump($city=="");
   if ($city==""){
     return false;
   }
