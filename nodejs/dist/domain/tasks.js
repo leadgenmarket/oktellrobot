@@ -45,7 +45,7 @@ var Task = /** @class */ (function () {
         }
         this.leadID = leadID;
         this.phone = phone;
-        this.nextCallTime = nextCallTime ? nextCallTime : new Date().getTime();
+        this.nextCallTime = nextCallTime ? nextCallTime : Math.floor(Date.now() / 1000);
         this.tries = tries ? tries : 0;
         this.cityName = cityName;
         this.scenarioID = scenarioID;

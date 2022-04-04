@@ -154,7 +154,7 @@ var TasksService = /** @class */ (function () {
                     case 1:
                         callsList = _a.sent();
                         callsList.forEach(function (task) { return __awaiter(_this, void 0, void 0, function () {
-                            var scenario, result, resUpd;
+                            var scenario, result;
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
                                     case 0: return [4 /*yield*/, this.repository.scenarios.getById(task.scenarioID)];
@@ -199,12 +199,9 @@ var TasksService = /** @class */ (function () {
                                     case 8:
                                         _a.sent();
                                         _a.label = 9;
-                                    case 9:
-                                        console.log(task);
-                                        return [4 /*yield*/, this.repository.tasks.update(task)];
+                                    case 9: return [4 /*yield*/, this.repository.tasks.update(task)];
                                     case 10:
-                                        resUpd = _a.sent();
-                                        console.log(resUpd);
+                                        _a.sent();
                                         _a.label = 11;
                                     case 11: return [2 /*return*/];
                                 }
@@ -225,8 +222,8 @@ var TasksService = /** @class */ (function () {
             return phone;
         };
         this.nowPlusHour = function () {
-            var time = new Date().getTime();
-            time += 3600000;
+            var time = Math.floor(Date.now() / 1000);
+            time += 3600;
             return time;
         };
         this.repository = repo;

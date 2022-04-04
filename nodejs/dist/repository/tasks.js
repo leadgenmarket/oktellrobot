@@ -112,7 +112,7 @@ var TasksRepository = /** @class */ (function () {
             var result, tasks;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.collection.find({ phone: { $ne: null }, cityName: { $ne: null }, finished: false }).toArray()];
+                    case 0: return [4 /*yield*/, this.collection.find({ phone: { $ne: null }, cityName: { $ne: null }, finished: false, nextCallTime: { $lte: Math.floor(Date.now() / 1000) } }).toArray()];
                     case 1:
                         result = _a.sent();
                         tasks = this.convertListToTaskList(result);

@@ -30,7 +30,7 @@ export default class TasksRepository {
     }
 
     getTasksToCall = async (): Promise<Task[]> => {
-        const result: mongoDB.WithId<mongoDB.Document>[] = await this.collection.find({phone: { $ne: null }, cityName: { $ne: null }, finished: false}).toArray()
+        const result: mongoDB.WithId<mongoDB.Document>[] = await this.collection.find({phone: { $ne: null }, cityName: { $ne: null }, finished: false, nextCallTime: { $lte: Math.floor(Date.now() / 1000)}}).toArray()
         let tasks = this.convertListToTaskList(result)
         return tasks
     }

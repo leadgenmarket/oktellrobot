@@ -6,6 +6,7 @@ import * as mongoDB from "mongodb"
 import Services from './services/services';
 import Repositories from './repository/repositories';
 import Handlers from './handlers/handlers';
+import { time } from 'console';
 
 dotenv.config();
 
@@ -32,6 +33,12 @@ handlers.initHandlers()
 
 const server = app.listen(PORT, () => console.log(`Running on ${PORT} ⚡`));
 
+//с интервалом в минуту смотрим нужно ли совершать звонки
+let callsInterval = setInterval(async ()=>{
+  console.log("make calls")
+  await services.tasks.makeCalls()
+}, 60000)
+
 //gracefull shutdown
 const serverGracefullShutdown = () => {
   console.info('SIGTERM signal received.');
@@ -40,6 +47,7 @@ const serverGracefullShutdown = () => {
     client.close(() => {
       console.log('mongo client disposed');
       services.dispose()
+      clearInterval(callsInterval)
     });
     process.exitCode = 1;
   });
