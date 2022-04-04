@@ -91,8 +91,8 @@ export default class TasksService {
           }
           //увеличиваем счетчик звонков
           task.tries += 1
-          //следующий звонок через час, если нужен
-          task.nextCallTime = this.nowPlusHour()
+          //если попросили перезвонить, то следующий звонок делаем через 2 часа (можно ли определять что занято?) 
+          task.nextCallTime = result.isAskedToCallLater()?this.nowPlusHour():this.nowPlus2Hours()
           //если кол-во звонков, больше кол-ва максимума в сценарии, то закрываем таску
           if (task.tries>=scenario.maxTries && !task.finished) {
             task.finished = true
@@ -150,6 +150,17 @@ export default class TasksService {
     protected nowPlusHour = ():number => {
       let time  = Math.floor(Date.now() / 1000)
       time += 3600
+      return time
+    }
+
+    protected nowPlus2Hours = ():number => {
+      let time  = Math.floor(Date.now() / 1000)
+      time += 7200
+      return time
+    }
+    protected nowPlus30Minutes = ():number => {
+      let time  = Math.floor(Date.now() / 1000)
+      time += 1800
       return time
     }
 }
