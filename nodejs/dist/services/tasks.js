@@ -152,11 +152,11 @@ var TasksService = /** @class */ (function () {
                             console.log("already running");
                             return [2 /*return*/];
                         }
-                        this.running = true;
                         if (this.dashaApi == null) {
                             console.log("not initialized yet");
                             return [2 /*return*/, false];
                         }
+                        this.running = true;
                         return [4 /*yield*/, this.repository.tasks.getTasksToCall()];
                     case 1:
                         callsList = _a.sent();

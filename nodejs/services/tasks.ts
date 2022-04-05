@@ -68,11 +68,11 @@ export default class TasksService {
         console.log("already running")
         return
       }
-      this.running = true
       if (this.dashaApi == null) {
         console.log("not initialized yet")
         return false
       }
+      this.running = true
       var callsList = await this.repository.tasks.getTasksToCall()
       await Promise.all(callsList.map(async (task) => {
         let scenario = await this.repository.scenarios.getById(task.scenarioID!)

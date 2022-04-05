@@ -27,7 +27,8 @@
       "sorry_wont_call":{},
       "i_will_call_back": {},
       "success":{},
-      "do_you_want_to_buy":{}
+      "do_you_want_to_buy":{},
+      "number_question":{}
     },
     "phrases": {
       "i_will_call_back": [
@@ -186,6 +187,9 @@
       },
       "do_you_want_to_buy": {
           "text": "Подскажите пожалуйста, вы планируете покупку квартиры?"
+      },
+      "number_question": {
+        "text": "Ваш номер телефона передал отдел маркетинга. Подскажите, могу вам помочь в подборе квартиры?"
       }
     }
   }
