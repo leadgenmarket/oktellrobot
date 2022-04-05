@@ -14,11 +14,11 @@ start node root
     {
         #connectSafe($phone);
         #waitForSpeech(1000);
-        if ($city == "Новоссибирск") {
+        if ($city == "новоссибирск") {
             #say("greeting_nsk");
-        } else if ($city == "Санкт-Петербург") {
+        } else if ($city == "санкт-петербург") {
             #say("greeting_spb");
-        } else if ($city == "Ростов-на-Дону") {
+        } else if ($city == "ростов-на-дону") {
             #say("greeting_rnd");
         } else {
             #say("greeting_msk");

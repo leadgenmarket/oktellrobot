@@ -135,7 +135,7 @@ class LeadgenAmoClient {
     {
       try {
         $customFields = $lead->getCustomFieldsValues();
-        $city = $customFields->getBy('fieldId', 416699)->getValues()[0]->getValue();
+        $city = $customFields->getBy('fieldId', 467915)->getValues()[0]->getValue();
         return $city;
       } catch (\Throwable $e) {
         return "";

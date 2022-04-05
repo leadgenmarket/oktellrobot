@@ -121,6 +121,7 @@ export default class TasksService {
     protected async makeCall(phone: string, city:string, dashaApi: dasha.Application<Record<string, unknown>, Record<string, unknown>>):Promise<CallResult> {
       const audio = new AudioResources();
       audio.addFolder("audio");
+      city = city.toLowerCase();
       
       dashaApi.ttsDispatcher = (conv) => "custom";
       dashaApi.customTtsProvider = async (text, voice) => {
