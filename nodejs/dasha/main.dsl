@@ -3,6 +3,7 @@ context
 {
     input phone: string;
     input city: string;
+    cityCase: string = "";
     output positive_or_negative: boolean = false;
     output answered: boolean = false;
     output ask_call_later: boolean = false;
@@ -23,6 +24,7 @@ start node root
         } else {
             #say("greeting_msk");
         }
+        set $cityCase = $city;
         set $answered=true;
         wait *;
     }
@@ -37,11 +39,11 @@ start node root
 node who_are_you {
     do
     {
-        if ($city == "новоссибирск") {
+        if ($cityCase == "новоссибирск") {
             #say("who_are_you_nsk");
-        } else if ($city == "cанкт-петербург") {
+        } else if ($cityCase == "санкт-петербург") {
             #say("who_are_you_spb");
-        } else if ($city == "ростов-на-дону") {
+        } else if ($cityCase == "ростов-на-дону") {
             #say("who_are_you_rnd");
         } else {
             #say("who_are_you_msk");
@@ -64,6 +66,7 @@ node do_you_want_to_buy {
     {
         positive: goto succees on #messageHasSentiment("positive");
         negative: goto negative on #messageHasSentiment("negative");
+        who_are_you: goto who_are_you on #messageHasIntent("who_are_you");
     }
 }
 

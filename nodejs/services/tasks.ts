@@ -13,6 +13,8 @@ export default class TasksService {
     repository: Repositories
 
     dashaApi?:  dasha.Application<Record<string, unknown>, Record<string, unknown>> | null = null
+    running: boolean = false
+
     constructor(repo: Repositories) {
         this.repository = repo
         dasha.deploy('./dasha').then((dashaDep: dasha.Application<Record<string, unknown>, Record<string, unknown>>)=>{
@@ -62,12 +64,17 @@ export default class TasksService {
     }
 
     makeCalls = async () => {
+      if (this.running) {
+        console.log("already running")
+        return
+      }
+      this.running = true
       if (this.dashaApi == null) {
         console.log("not initialized yet")
         return false
       }
       var callsList = await this.repository.tasks.getTasksToCall()
-      callsList.forEach(async (task) => {
+      await Promise.all(callsList.map(async (task) => {
         let scenario = await this.repository.scenarios.getById(task.scenarioID!)
         if (scenario) {
           let result = await this.makeCall(this.formatPhone(task.phone!), task.cityName!, this.dashaApi!)
@@ -102,8 +109,10 @@ export default class TasksService {
           }
           
           await this.repository.tasks.update(task)
+         
         }
-      })
+      }))
+      this.running = false
       return true
     }
 
