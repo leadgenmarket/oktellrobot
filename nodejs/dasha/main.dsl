@@ -37,11 +37,11 @@ start node root
 node who_are_you {
     do
     {
-        if ($city == "Новоссибирск") {
+        if ($city == "новоссибирск") {
             #say("who_are_you_nsk");
-        } else if ($city == "Санкт-Петербург") {
+        } else if ($city == "cанкт-петербург") {
             #say("who_are_you_spb");
-        } else if ($city == "Ростов-на-Дону") {
+        } else if ($city == "ростов-на-дону") {
             #say("who_are_you_rnd");
         } else {
             #say("who_are_you_msk");
