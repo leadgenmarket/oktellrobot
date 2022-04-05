@@ -65,7 +65,6 @@ var fs = require('fs');
 var customTts_1 = __importDefault(require("../utils/customTts"));
 var callResult_1 = __importDefault(require("../domain/callResult"));
 var checkTime_1 = __importDefault(require("../utils/checkTime"));
-var moment = require("moment");
 var TasksService = /** @class */ (function () {
     function TasksService(repo) {
         var _this = this;
@@ -184,14 +183,14 @@ var TasksService = /** @class */ (function () {
                                             task.success = result.isSuccess();
                                             if (!task.success) return [3 /*break*/, 5];
                                             //добавляем коммент в лид, что успешно
-                                            return [4 /*yield*/, this.repository.amoBuffer.add(new amoBuf_1.default("", 1, task.leadID, "", task.phone, scenario.successStatus, "\u041A\u043B\u0438\u0435\u043D\u0442 \u043E\u0442\u0432\u0435\u0442\u0438\u043B \u0414\u0410 (\u0441\u0446\u0435\u043D\u0430\u0440\u0438\u0439 - " + scenario.name + ")"))];
+                                            return [4 /*yield*/, this.repository.amoBuffer.add(new amoBuf_1.default("", 1, task.leadID, "", task.phone, scenario.successStatus, "\u041A\u043B\u0438\u0435\u043D\u0442 \u043E\u0442\u0432\u0435\u0442\u0438\u043B \u0414\u0410 (\u0441\u0446\u0435\u043D\u0430\u0440\u0438\u0439 - " + scenario.name + ", \u0437\u0430\u043F\u0438\u0441\u044C - " + result.getRecordingURL() + ")"))];
                                         case 4:
                                             //добавляем коммент в лид, что успешно
                                             _a.sent();
                                             return [3 /*break*/, 7];
                                         case 5: 
                                         //добавляем коммент в лид, что не успешно
-                                        return [4 /*yield*/, this.repository.amoBuffer.add(new amoBuf_1.default("", 1, task.leadID, "", task.phone, scenario.discardStatus, "\u041A\u043B\u0438\u0435\u043D\u0442 \u043E\u0442\u0432\u0435\u0442\u0438\u043B \u041D\u0415\u0422 (\u0441\u0446\u0435\u043D\u0430\u0440\u0438\u0439 - " + scenario.name + ")"))];
+                                        return [4 /*yield*/, this.repository.amoBuffer.add(new amoBuf_1.default("", 1, task.leadID, "", task.phone, scenario.discardStatus, "\u041A\u043B\u0438\u0435\u043D\u0442 \u043E\u0442\u0432\u0435\u0442\u0438\u043B \u041D\u0415\u0422 (\u0441\u0446\u0435\u043D\u0430\u0440\u0438\u0439 - " + scenario.name + "), \u0437\u0430\u043F\u0438\u0441\u044C - " + result.getRecordingURL() + ")"))];
                                         case 6:
                                             //добавляем коммент в лид, что не успешно
                                             _a.sent();
@@ -301,7 +300,6 @@ var TasksService = /** @class */ (function () {
                         return [4 /*yield*/, conv.execute()];
                     case 2:
                         result = _a.sent();
-                        console.log(result.recordingUrl);
                         return [4 /*yield*/, dashaApi.stop()];
                     case 3:
                         _a.sent();

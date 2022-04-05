@@ -8,8 +8,6 @@ const fs = require('fs');
 import AudioResources from "../utils/customTts"
 import CallResult from "../domain/callResult";
 import checkTime from "../utils/checkTime";
-const moment = require("moment");
-import simpleCsvSchedule from "../utils/sdk-upload"
 
 export default class TasksService {
     repository: Repositories
