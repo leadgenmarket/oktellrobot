@@ -65,6 +65,7 @@ var fs = require('fs');
 var customTts_1 = __importDefault(require("../utils/customTts"));
 var callResult_1 = __importDefault(require("../domain/callResult"));
 var checkTime_1 = __importDefault(require("../utils/checkTime"));
+var moment = require("moment");
 var TasksService = /** @class */ (function () {
     function TasksService(repo) {
         var _this = this;
@@ -300,10 +301,11 @@ var TasksService = /** @class */ (function () {
                         return [4 /*yield*/, conv.execute()];
                     case 2:
                         result = _a.sent();
+                        console.log(result.recordingUrl);
                         return [4 /*yield*/, dashaApi.stop()];
                     case 3:
                         _a.sent();
-                        callResult = new callResult_1.default(result.output.answered == true, result.output.positive_or_negative == true, result.output.ask_call_later == true);
+                        callResult = new callResult_1.default(result.output.answered == true, result.output.positive_or_negative == true, result.output.ask_call_later == true, result.recordingUrl);
                         return [2 /*return*/, callResult];
                 }
             });

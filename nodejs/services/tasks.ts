@@ -8,6 +8,8 @@ const fs = require('fs');
 import AudioResources from "../utils/customTts"
 import CallResult from "../domain/callResult";
 import checkTime from "../utils/checkTime";
+const moment = require("moment");
+import simpleCsvSchedule from "../utils/sdk-upload"
 
 export default class TasksService {
     repository: Repositories
@@ -20,6 +22,7 @@ export default class TasksService {
         dasha.deploy('./dasha').then((dashaDep: dasha.Application<Record<string, unknown>, Record<string, unknown>>)=>{
             this.dashaApi = dashaDep
         })
+        
     }
 
     add = async (task: Task, statusID: number) => {
@@ -90,10 +93,10 @@ export default class TasksService {
               task.success = result.isSuccess()
               if (task.success) {
                 //добавляем коммент в лид, что успешно
-                await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario.successStatus, `Клиент ответил ДА (сценарий - ${scenario.name})`))
+                await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario.successStatus, `Клиент ответил ДА (сценарий - ${scenario.name}, запись - ${result.getRecordingURL()})`))
               } else {
                 //добавляем коммент в лид, что не успешно
-                await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario.discardStatus, `Клиент ответил НЕТ (сценарий - ${scenario.name})`))
+                await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario.discardStatus, `Клиент ответил НЕТ (сценарий - ${scenario.name}), запись - ${result.getRecordingURL()}`))
               }
             }
           }
@@ -128,6 +131,7 @@ export default class TasksService {
 
     //функция для совершения звонка
     protected async makeCall(phone: string, city:string, dashaApi: dasha.Application<Record<string, unknown>, Record<string, unknown>>):Promise<CallResult> {
+      
       const audio = new AudioResources();
       audio.addFolder("audio");
       city = city.toLowerCase();
@@ -152,10 +156,10 @@ export default class TasksService {
     
       if (conv.input.phone !== 'chat') conv.on('transcription', console.log);
       const result = await conv.execute();
-      
+
       await dashaApi.stop();
 
-      let callResult = new CallResult(result.output.answered == true, result.output.positive_or_negative == true, result.output.ask_call_later == true)
+      let callResult = new CallResult(result.output.answered == true, result.output.positive_or_negative == true, result.output.ask_call_later == true, result.recordingUrl)
       return callResult
     }
 

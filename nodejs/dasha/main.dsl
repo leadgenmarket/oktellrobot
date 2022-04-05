@@ -13,8 +13,8 @@ start node root
     do
     {
         #connectSafe($phone);
-        #say("hello");
         #waitForSpeech(1000);
+        #say("hello");
         wait *;
     }
     transitions
@@ -26,8 +26,7 @@ start node root
 node greet {
     do
     {
-        #waitForSpeech(1000);
-        if ($city == "новоссибирск") {
+        if ($city == "новосибирск") {
             #say("greeting_nsk");
         } else if ($city == "санкт-петербург") {
             #say("greeting_spb");
@@ -51,7 +50,7 @@ node greet {
 node who_are_you {
     do
     {
-        if ($city == "новоссибирск") {
+        if ($city == "новосибирск") {
             #say("who_are_you_nsk");
         } else if ($city == "санкт-петербург") {
             #say("who_are_you_spb");
@@ -78,6 +77,7 @@ node number_question {
     {
         positive: goto succees on #messageHasSentiment("positive");
         negative: goto negative on #messageHasSentiment("negative");
+        who_are_you: goto who_are_you on #messageHasIntent("who_are_you");
     }
 }
 
@@ -92,6 +92,7 @@ node do_you_want_to_buy {
         positive: goto succees on #messageHasSentiment("positive");
         negative: goto negative on #messageHasSentiment("negative");
         who_are_you: goto who_are_you on #messageHasIntent("who_are_you");
+        number_question: goto number_question on #messageHasIntent("number_question");
     }
 }
 
