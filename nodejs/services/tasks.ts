@@ -96,7 +96,7 @@ export default class TasksService {
                 await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario.successStatus, `Клиент ответил ДА (сценарий - ${scenario.name}, запись - ${result.getRecordingURL()})`))
               } else {
                 //добавляем коммент в лид, что не успешно
-                await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario.discardStatus, `Клиент ответил НЕТ (сценарий - ${scenario.name}), запись - ${result.getRecordingURL()}`))
+                await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario.discardStatus, `Клиент ответил НЕТ (сценарий - ${scenario.name}), запись - ${result.getRecordingURL()})`))
               }
             }
           }
