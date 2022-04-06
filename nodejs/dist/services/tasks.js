@@ -295,6 +295,7 @@ var TasksService = /** @class */ (function () {
                     case 1:
                         _a.sent();
                         conv = dashaApi.createConversation({ phone: phone, city: city });
+                        conv.sip.config = "mtt_tcp_1";
                         if (conv.input.phone !== 'chat')
                             conv.on('transcription', console.log);
                         return [4 /*yield*/, conv.execute()];

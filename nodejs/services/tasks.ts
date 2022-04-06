@@ -151,6 +151,8 @@ export default class TasksService {
       await dashaApi.start({concurrency:10});
     
       const conv = dashaApi.createConversation({ phone: phone, city:city });
+
+      conv.sip.config = "mtt_tcp_1"
     
       if (conv.input.phone !== 'chat') conv.on('transcription', console.log);
       const result = await conv.execute();
