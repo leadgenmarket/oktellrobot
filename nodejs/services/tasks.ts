@@ -13,14 +13,25 @@ export default class TasksService {
     repository: Repositories
 
     dashaApi?:  dasha.Application<Record<string, unknown>, Record<string, unknown>> | null = null
+    audio: AudioResources
     running: boolean = false
 
     constructor(repo: Repositories) {
         this.repository = repo
+        //инициализируем папку с аудио
+        this.audio = new AudioResources();
+        this.audio.addFolder("audio");
+
         dasha.deploy('./dasha').then((dashaDep: dasha.Application<Record<string, unknown>, Record<string, unknown>>)=>{
             this.dashaApi = dashaDep
+            this.dashaApi.customTtsProvider = async (text, voice) => {
+              console.log(`Tts asking for phrase with text ${text} and voice ${JSON.stringify(voice)}`);
+              const fname = this.audio.GetPath(text, voice);
+      
+              console.log(`Found in file ${fname}`);
+              return dasha.audio.fromFile(fname);
+            };
         })
-        
     }
 
     add = async (task: Task, statusID: number) => {
@@ -129,19 +140,10 @@ export default class TasksService {
 
     //функция для совершения звонка
     protected async makeCall(phone: string, city:string, dashaApi: dasha.Application<Record<string, unknown>, Record<string, unknown>>):Promise<CallResult> {
-      
-      const audio = new AudioResources();
-      audio.addFolder("audio");
+
       city = city.toLowerCase();
       
       dashaApi.ttsDispatcher = (conv) => "custom";
-      dashaApi.customTtsProvider = async (text, voice) => {
-        console.log(`Tts asking for phrase with text ${text} and voice ${JSON.stringify(voice)}`);
-        const fname = audio.GetPath(text, voice);
-
-        console.log(`Found in file ${fname}`);
-        return dasha.audio.fromFile(fname);
-      };
 
       dashaApi.connectionProvider = async (conv) =>
         conv.input.phone === "chat"
@@ -150,7 +152,7 @@ export default class TasksService {
     
       await dashaApi.start({concurrency:10});
     
-      const conv = dashaApi.createConversation({ phone: phone, city:city });
+      const conv = dashaApi.createConversation({ phone: phone, city:city, outbound: true });
     
       if (conv.input.phone !== 'chat') conv.on('transcription', console.log);
       const result = await conv.execute();
@@ -159,6 +161,24 @@ export default class TasksService {
 
       let callResult = new CallResult(result.output.answered == true, result.output.positive_or_negative == true, result.output.ask_call_later == true, result.recordingUrl)
       return callResult
+    }
+
+    //входящие звонки
+    protected async inboundCallsReciver(dashaApi: dasha.Application<Record<string, unknown>, Record<string, unknown>>):Promise<boolean> {
+      if (this.dashaApi == null) {
+        console.log("not initialized yet")
+        return false
+      }
+
+      dashaApi.queue.on("ready", async (key, conv, info) => {
+        console.log(info.sip);
+        conv.audio.tts = "dasha";
+        const result = await conv.execute({ channel: "audio" });
+        console.log(result.output);
+      });
+
+      await dashaApi.start();
+      return true
     }
 
     protected nowPlusHour = ():number => {

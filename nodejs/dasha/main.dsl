@@ -3,17 +3,25 @@ context
 {
     input phone: string;
     input city: string;
+    input outbound: boolean;
     output positive_or_negative: boolean = false;
     output answered: boolean = false;
     output ask_call_later: boolean = false;
+    output cityOut: string = "";
 }
 
 start node root
 {
     do
     {
-        #connectSafe($phone);
-        #waitForSpeech(1000);
+        if ($outbound){
+            //исходящие
+            #connectSafe($phone);
+            #waitForSpeech(1000);
+        } else {
+            //входящие
+            #connectSafe("");
+        }
         #say("hello");
         wait *;
     }
@@ -26,7 +34,9 @@ start node root
 node greet {
     do
     {
-        if ($city == "новосибирск") {
+        if (!$outbound) {
+            #say("greet_simple");
+        } else if ($city == "новосибирск") {
             #say("greeting_nsk");
         } else if ($city == "санкт-петербург") {
             #say("greeting_spb");
@@ -50,7 +60,10 @@ node greet {
 node who_are_you {
     do
     {
-        if ($city == "новосибирск") {
+        
+        if ($outbound == false) {
+            #say("who_are_you");
+        } else if ($city == "новосибирск") {
             #say("who_are_you_nsk");
         } else if ($city == "санкт-петербург") {
             #say("who_are_you_spb");
@@ -100,9 +113,18 @@ node succees
 {
     do
     {
-        #say("success");
+        
         set $positive_or_negative=true;
-        exit;
+        if ($outbound) {
+            //если исходящий, то говорим спасибо и выходим
+            #say("success");
+            exit;
+        } else {
+            //если входящий, то спращиваем город
+            #say("city_question");
+            set $cityOut = #getMessageText();
+            exit;
+        }
     }
     transitions
     {
