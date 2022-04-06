@@ -1,4 +1,5 @@
 import "commonReactions/all.dsl";
+import "types.dsl";
 context
 {
     input phone: string;
@@ -7,8 +8,10 @@ context
     output positive_or_negative: boolean = false;
     output answered: boolean = false;
     output ask_call_later: boolean = false;
-    output cityOut: string = "";
+    output cityInfo: CityInfo = {inputs:[], name:""};
 }
+
+external function getCity(cityInfo: CityInfo): CityInfo;
 
 start node root
 {
@@ -20,7 +23,7 @@ start node root
             #waitForSpeech(1000);
         } else {
             //входящие
-            #connectSafe("");
+            #connectSafe($phone); //после теста должно быть так - #connectSafe("");
         }
         #say("hello");
         wait *;
@@ -122,12 +125,46 @@ node succees
         } else {
             //если входящий, то спращиваем город
             #say("city_question");
-            set $cityOut = #getMessageText();
+            wait *;
             exit;
         }
     }
     transitions
     {
+        validate_city_name: goto validate_city_name on true;
+    }
+}
+
+node validate_city_name{
+    do
+    {
+        $cityInfo.inputs.push(#getMessageText().trim());
+        set $cityInfo = external getCity({name:"", inputs: $cityInfo.inputs});
+        //если кол-во попыток меньше 3 и город не распознан, то спрашиваем еще раз, иначе выходим
+        #log($cityInfo.inputs.length());
+        if ($cityInfo.name == "" && $cityInfo.inputs.length() < 3){
+            goto ask_again;
+        } else {
+           #say("success");
+           exit; 
+        }
+    }
+    transitions
+    {
+        ask_again: goto dont_understand_city;
+    }
+}
+
+node dont_understand_city {
+    do
+    {
+        #say("dont_understand");
+        wait *;
+        exit;
+    }
+    transitions
+    {
+        validate_city_name: goto validate_city_name on true;
     }
 }
 

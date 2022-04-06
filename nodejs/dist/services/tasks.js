@@ -65,6 +65,34 @@ var fs = require('fs');
 var customTts_1 = __importDefault(require("../utils/customTts"));
 var callResult_1 = __importDefault(require("../domain/callResult"));
 var checkTime_1 = __importDefault(require("../utils/checkTime"));
+var citiesList = {
+    "Санкт-Петербург": [
+        "в спб",
+        "питер",
+        "питере",
+        "санкт-петербург",
+        "санктпетербург",
+        "в санктпетербурге",
+        "санкт",
+        "в питере"
+    ],
+    "Ростов-на-Дону": [
+        "рнд",
+        "ростов",
+        "ростове",
+        "ростов-на-дону"
+    ],
+    "Москва": [
+        "мск",
+        "москва",
+        "москве",
+    ],
+    "Новосибирск": [
+        "новосиб",
+        "новосибе",
+        "новосибирске"
+    ]
+};
 var TasksService = /** @class */ (function () {
     function TasksService(repo) {
         var _this = this;
@@ -248,31 +276,38 @@ var TasksService = /** @class */ (function () {
             return time;
         };
         this.repository = repo;
+        //инициализируем папку с аудио
+        this.audio = new customTts_1.default();
+        this.audio.addFolder("audio");
         dasha.deploy('./dasha').then(function (dashaDep) {
             _this.dashaApi = dashaDep;
+            //провайдер аудиозаписей
+            _this.dashaApi.customTtsProvider = function (text, voice) { return __awaiter(_this, void 0, void 0, function () {
+                var fname;
+                return __generator(this, function (_a) {
+                    console.log("Tts asking for phrase with text " + text + " and voice " + JSON.stringify(voice));
+                    fname = this.audio.GetPath(text, voice);
+                    console.log("Found in file " + fname);
+                    return [2 /*return*/, dasha.audio.fromFile(fname)];
+                });
+            }); };
+            //внешние функции
+            for (var _i = 0, _a = Object.entries(app_external_functions); _i < _a.length; _i++) {
+                var _b = _a[_i], func_name = _b[0], func = _b[1];
+                _this.dashaApi.setExternal(func_name, func);
+            }
         });
     }
     //функция для совершения звонка
     TasksService.prototype.makeCall = function (phone, city, dashaApi) {
         return __awaiter(this, void 0, void 0, function () {
-            var audio, conv, result, callResult;
+            var conv, result, callResult;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        audio = new customTts_1.default();
-                        audio.addFolder("audio");
                         city = city.toLowerCase();
                         dashaApi.ttsDispatcher = function (conv) { return "custom"; };
-                        dashaApi.customTtsProvider = function (text, voice) { return __awaiter(_this, void 0, void 0, function () {
-                            var fname;
-                            return __generator(this, function (_a) {
-                                console.log("Tts asking for phrase with text " + text + " and voice " + JSON.stringify(voice));
-                                fname = audio.GetPath(text, voice);
-                                console.log("Found in file " + fname);
-                                return [2 /*return*/, dasha.audio.fromFile(fname)];
-                            });
-                        }); };
                         dashaApi.connectionProvider = function (conv) { return __awaiter(_this, void 0, void 0, function () {
                             var _a, _b, _c;
                             return __generator(this, function (_d) {
@@ -294,7 +329,7 @@ var TasksService = /** @class */ (function () {
                         return [4 /*yield*/, dashaApi.start({ concurrency: 10 })];
                     case 1:
                         _a.sent();
-                        conv = dashaApi.createConversation({ phone: phone, city: city });
+                        conv = dashaApi.createConversation({ phone: phone, city: city, outbound: false });
                         if (conv.input.phone !== 'chat')
                             conv.on('transcription', console.log);
                         return [4 /*yield*/, conv.execute()];
@@ -303,8 +338,43 @@ var TasksService = /** @class */ (function () {
                         return [4 /*yield*/, dashaApi.stop()];
                     case 3:
                         _a.sent();
+                        console.log(result.recordingUrl);
                         callResult = new callResult_1.default(result.output.answered == true, result.output.positive_or_negative == true, result.output.ask_call_later == true, result.recordingUrl);
                         return [2 /*return*/, callResult];
+                }
+            });
+        });
+    };
+    //входящие звонки
+    TasksService.prototype.inboundCallsReciver = function (dashaApi) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (this.dashaApi == null) {
+                            console.log("not initialized yet");
+                            return [2 /*return*/, false];
+                        }
+                        dashaApi.queue.on("ready", function (key, conv, info) { return __awaiter(_this, void 0, void 0, function () {
+                            var result;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        console.log(info.sip);
+                                        conv.audio.tts = "dasha";
+                                        return [4 /*yield*/, conv.execute({ channel: "audio" })];
+                                    case 1:
+                                        result = _a.sent();
+                                        console.log(result.output);
+                                        return [2 /*return*/];
+                                }
+                            });
+                        }); });
+                        return [4 /*yield*/, dashaApi.start()];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/, true];
                 }
             });
         });
@@ -312,3 +382,20 @@ var TasksService = /** @class */ (function () {
     return TasksService;
 }());
 exports.default = TasksService;
+var app_external_functions = {
+    getCity: function (argv, conv) { return __awaiter(void 0, void 0, void 0, function () {
+        var cityInput, ret;
+        return __generator(this, function (_a) {
+            cityInput = argv.cityInfo;
+            console.log(cityInput);
+            ret = cityInput;
+            Object.keys(citiesList).map(function (city) {
+                if (citiesList[city].includes(cityInput.inputs[cityInput.inputs.length - 1])) {
+                    ret.name = city;
+                }
+            });
+            console.log(ret);
+            return [2 /*return*/, ret];
+        });
+    }); },
+};

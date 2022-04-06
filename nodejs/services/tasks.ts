@@ -9,6 +9,35 @@ import AudioResources from "../utils/customTts"
 import CallResult from "../domain/callResult";
 import checkTime from "../utils/checkTime";
 
+const citiesList: {[key:string]:string[]} = {
+  "Санкт-Петербург": [
+    "в спб",
+    "питер",
+    "питере",
+    "санкт-петербург",
+    "санктпетербург",
+    "в санктпетербурге",
+    "санкт",
+    "в питере"
+  ],
+  "Ростов-на-Дону": [
+    "рнд",
+    "ростов",
+    "ростове",
+    "ростов-на-дону"
+  ],
+  "Москва": [
+    "мск",
+    "москва",
+    "москве",
+  ],
+  "Новосибирск": [
+    "новосиб",
+    "новосибе",
+    "новосибирске"
+  ]
+}
+
 export default class TasksService {
     repository: Repositories
 
@@ -24,6 +53,8 @@ export default class TasksService {
 
         dasha.deploy('./dasha').then((dashaDep: dasha.Application<Record<string, unknown>, Record<string, unknown>>)=>{
             this.dashaApi = dashaDep
+
+            //провайдер аудиозаписей
             this.dashaApi.customTtsProvider = async (text, voice) => {
               console.log(`Tts asking for phrase with text ${text} and voice ${JSON.stringify(voice)}`);
               const fname = this.audio.GetPath(text, voice);
@@ -31,6 +62,11 @@ export default class TasksService {
               console.log(`Found in file ${fname}`);
               return dasha.audio.fromFile(fname);
             };
+
+            //внешние функции
+            for (const [func_name, func] of Object.entries(app_external_functions)) {
+              this.dashaApi.setExternal(func_name, func);
+            }
         })
     }
 
@@ -152,13 +188,14 @@ export default class TasksService {
     
       await dashaApi.start({concurrency:10});
     
-      const conv = dashaApi.createConversation({ phone: phone, city:city, outbound: true });
+      const conv = dashaApi.createConversation({ phone: phone, city:city, outbound: false }); //не забыть поменять на true после тестов
     
       if (conv.input.phone !== 'chat') conv.on('transcription', console.log);
       const result = await conv.execute();
 
       await dashaApi.stop();
 
+      console.log(result.recordingUrl)
       let callResult = new CallResult(result.output.answered == true, result.output.positive_or_negative == true, result.output.ask_call_later == true, result.recordingUrl)
       return callResult
     }
@@ -197,4 +234,21 @@ export default class TasksService {
       time += 1800
       return time
     }
+}
+
+const app_external_functions = {
+  getCity: async (argv: any, conv: any) => {
+    const cityInput = argv.cityInfo;
+    console.log(cityInput);
+
+    let ret = cityInput;
+    
+    Object.keys(citiesList).map(city => {
+      if (citiesList[city].includes(cityInput.inputs[cityInput.inputs.length-1])) {
+        ret.name = city
+      }
+    });
+    console.log(ret);
+    return ret;
+  },
 }
