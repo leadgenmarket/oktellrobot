@@ -134,7 +134,6 @@ export default class TasksService {
       audio.addFolder("audio");
       city = city.toLowerCase();
       
-      dashaApi.ttsDispatcher = (conv) => "custom";
       dashaApi.customTtsProvider = async (text, voice) => {
         console.log(`Tts asking for phrase with text ${text} and voice ${JSON.stringify(voice)}`);
         const fname = audio.GetPath(text, voice);
@@ -143,19 +142,22 @@ export default class TasksService {
         return dasha.audio.fromFile(fname);
       };
 
-      dashaApi.connectionProvider = async (conv) =>
-        conv.input.phone === "chat"
-          ? dasha.chat.connect(await dasha.chat.createConsoleChat())
-          : dasha.sip.connect(new dasha.sip.Endpoint("default"));
-    
       await dashaApi.start({concurrency:10});
     
       const conv = dashaApi.createConversation({ phone: phone, city:city });
 
       conv.sip.config = "mtt_tcp_1"
-    
-      if (conv.input.phone !== 'chat') conv.on('transcription', console.log);
-      const result = await conv.execute();
+      conv.audio.tts = "custom";
+
+      const chatMode = conv.input.phone === 'chat';
+
+      if (!chatMode) {
+        conv.on('transcription', console.log);
+      } else {
+        await dasha.chat.createConsoleChat(conv);
+      }
+
+      const result = await conv.execute({ channel: chatMode ? "text" : "audio" });
 
       await dashaApi.stop();
 
