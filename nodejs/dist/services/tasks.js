@@ -188,6 +188,9 @@ var TasksService = /** @class */ (function () {
                         return [4 /*yield*/, this.repository.tasks.getTasksToCall()];
                     case 1:
                         callsList = _a.sent();
+                        return [4 /*yield*/, this.dashaApi.start({ concurrency: 10 })];
+                    case 2:
+                        _a.sent();
                         return [4 /*yield*/, Promise.all(callsList.map(function (task) { return __awaiter(_this, void 0, void 0, function () {
                                 var scenario, result;
                                 return __generator(this, function (_a) {
@@ -243,7 +246,10 @@ var TasksService = /** @class */ (function () {
                                     }
                                 });
                             }); }))];
-                    case 2:
+                    case 3:
+                        _a.sent();
+                        return [4 /*yield*/, this.dashaApi.stop()];
+                    case 4:
                         _a.sent();
                         this.running = false;
                         return [2 /*return*/, true];
@@ -306,26 +312,20 @@ var TasksService = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         city = city.toLowerCase();
-                        return [4 /*yield*/, dashaApi.start({ concurrency: 10 })];
-                    case 1:
-                        _a.sent();
                         conv = dashaApi.createConversation({ phone: phone, city: city, outbound: true });
                         conv.sip.config = "mtt_udp";
                         conv.audio.tts = "custom";
                         chatMode = conv.input.phone === 'chat';
-                        if (!!chatMode) return [3 /*break*/, 2];
+                        if (!!chatMode) return [3 /*break*/, 1];
                         conv.on('transcription', console.log);
-                        return [3 /*break*/, 4];
-                    case 2: return [4 /*yield*/, dasha.chat.createConsoleChat(conv)];
-                    case 3:
+                        return [3 /*break*/, 3];
+                    case 1: return [4 /*yield*/, dasha.chat.createConsoleChat(conv)];
+                    case 2:
                         _a.sent();
-                        _a.label = 4;
-                    case 4: return [4 /*yield*/, conv.execute({ channel: chatMode ? "text" : "audio" })];
-                    case 5:
+                        _a.label = 3;
+                    case 3: return [4 /*yield*/, conv.execute({ channel: chatMode ? "text" : "audio" })];
+                    case 4:
                         result = _a.sent();
-                        return [4 /*yield*/, dashaApi.stop()];
-                    case 6:
-                        _a.sent();
                         console.log(result);
                         callResult = new callResult_1.default(result.output.answered == true, result.output.positive_or_negative == true, result.output.ask_call_later == true, result.recordingUrl ? result.recordingUrl : "");
                         return [2 /*return*/, callResult];

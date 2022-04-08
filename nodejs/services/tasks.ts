@@ -122,6 +122,8 @@ export default class TasksService {
       }
       this.running = true
       var callsList = await this.repository.tasks.getTasksToCall()
+
+      await this.dashaApi.start({concurrency:10});
       await Promise.all(callsList.map(async (task) => {
         let scenario = await this.repository.scenarios.getById(task.scenarioID!)
         if (scenario) {
@@ -160,6 +162,7 @@ export default class TasksService {
          
         }
       }))
+      await this.dashaApi.stop();
       this.running = false
       return true
     }
@@ -178,8 +181,6 @@ export default class TasksService {
     protected async makeCall(phone: string, city:string, dashaApi: dasha.Application<Record<string, unknown>, Record<string, unknown>>):Promise<CallResult> {
 
       city = city.toLowerCase();
-
-      await dashaApi.start({concurrency:10});
     
       const conv = dashaApi.createConversation({ phone: phone, city:city, outbound: true });
 
@@ -195,8 +196,6 @@ export default class TasksService {
       }
 
       const result = await conv.execute({ channel: chatMode ? "text" : "audio" });
-
-      await dashaApi.stop();
 
       console.log(result)
       let callResult = new CallResult(result.output.answered == true, result.output.positive_or_negative == true, result.output.ask_call_later == true, result.recordingUrl?result.recordingUrl:"")
