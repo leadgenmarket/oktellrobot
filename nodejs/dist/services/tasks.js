@@ -255,7 +255,7 @@ var TasksService = /** @class */ (function () {
     //функция для совершения звонка
     TasksService.prototype.makeCall = function (phone, city, dashaApi) {
         return __awaiter(this, void 0, void 0, function () {
-            var audio, conv, result, callResult;
+            var audio, conv, chatMode, result, callResult;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -263,7 +263,6 @@ var TasksService = /** @class */ (function () {
                         audio = new customTts_1.default();
                         audio.addFolder("audio");
                         city = city.toLowerCase();
-                        dashaApi.ttsDispatcher = function (conv) { return "custom"; };
                         dashaApi.customTtsProvider = function (text, voice) { return __awaiter(_this, void 0, void 0, function () {
                             var fname;
                             return __generator(this, function (_a) {
@@ -273,36 +272,25 @@ var TasksService = /** @class */ (function () {
                                 return [2 /*return*/, dasha.audio.fromFile(fname)];
                             });
                         }); };
-                        dashaApi.connectionProvider = function (conv) { return __awaiter(_this, void 0, void 0, function () {
-                            var _a, _b, _c;
-                            return __generator(this, function (_d) {
-                                switch (_d.label) {
-                                    case 0:
-                                        if (!(conv.input.phone === "chat")) return [3 /*break*/, 2];
-                                        _c = (_b = dasha.chat).connect;
-                                        return [4 /*yield*/, dasha.chat.createConsoleChat()];
-                                    case 1:
-                                        _a = _c.apply(_b, [_d.sent()]);
-                                        return [3 /*break*/, 3];
-                                    case 2:
-                                        _a = dasha.sip.connect(new dasha.sip.Endpoint("default"));
-                                        _d.label = 3;
-                                    case 3: return [2 /*return*/, _a];
-                                }
-                            });
-                        }); };
                         return [4 /*yield*/, dashaApi.start({ concurrency: 10 })];
                     case 1:
                         _a.sent();
                         conv = dashaApi.createConversation({ phone: phone, city: city });
-                        conv.sip.config = "mtt_tcp_1";
-                        if (conv.input.phone !== 'chat')
-                            conv.on('transcription', console.log);
-                        return [4 /*yield*/, conv.execute()];
-                    case 2:
+                        conv.sip.config = "mtt_udp_1";
+                        conv.audio.tts = "custom";
+                        chatMode = conv.input.phone === 'chat';
+                        if (!!chatMode) return [3 /*break*/, 2];
+                        conv.on('transcription', console.log);
+                        return [3 /*break*/, 4];
+                    case 2: return [4 /*yield*/, dasha.chat.createConsoleChat(conv)];
+                    case 3:
+                        _a.sent();
+                        _a.label = 4;
+                    case 4: return [4 /*yield*/, conv.execute({ channel: chatMode ? "text" : "audio" })];
+                    case 5:
                         result = _a.sent();
                         return [4 /*yield*/, dashaApi.stop()];
-                    case 3:
+                    case 6:
                         _a.sent();
                         callResult = new callResult_1.default(result.output.answered == true, result.output.positive_or_negative == true, result.output.ask_call_later == true, result.recordingUrl);
                         return [2 /*return*/, callResult];
