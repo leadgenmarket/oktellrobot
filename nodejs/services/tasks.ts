@@ -178,20 +178,23 @@ export default class TasksService {
     protected async makeCall(phone: string, city:string, dashaApi: dasha.Application<Record<string, unknown>, Record<string, unknown>>):Promise<CallResult> {
 
       city = city.toLowerCase();
-      
-      dashaApi.ttsDispatcher = (conv) => "custom";
 
-      dashaApi.connectionProvider = async (conv) =>
-        conv.input.phone === "chat"
-          ? dasha.chat.connect(await dasha.chat.createConsoleChat())
-          : dasha.sip.connect(new dasha.sip.Endpoint("default"));
-    
       await dashaApi.start({concurrency:10});
     
-      const conv = dashaApi.createConversation({ phone: phone, city:city, outbound: false }); //не забыть поменять на true после тестов
-    
-      if (conv.input.phone !== 'chat') conv.on('transcription', console.log);
-      const result = await conv.execute();
+      const conv = dashaApi.createConversation({ phone: phone, city:city, outbound: true });
+
+      conv.sip.config = "mtt_tcp_1"
+      conv.audio.tts = "custom";
+
+      const chatMode = conv.input.phone === 'chat';
+
+      if (!chatMode) {
+        conv.on('transcription', console.log);
+      } else {
+        await dasha.chat.createConsoleChat(conv);
+      }
+
+      const result = await conv.execute({ channel: chatMode ? "text" : "audio" });
 
       await dashaApi.stop();
 

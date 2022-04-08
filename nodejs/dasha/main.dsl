@@ -23,7 +23,7 @@ start node root
             #waitForSpeech(1000);
         } else {
             //входящие
-            #connectSafe($phone); //после теста должно быть так - #connectSafe("");
+            #connectSafe("");
         }
         #say("hello");
         wait *;
