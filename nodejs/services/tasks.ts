@@ -183,7 +183,7 @@ export default class TasksService {
     
       const conv = dashaApi.createConversation({ phone: phone, city:city, outbound: true });
 
-      conv.sip.config = "mtt_tcp_1"
+      conv.sip.config = "mtt_udp"
       conv.audio.tts = "custom";
 
       const chatMode = conv.input.phone === 'chat';
@@ -198,8 +198,8 @@ export default class TasksService {
 
       await dashaApi.stop();
 
-      console.log(result.recordingUrl)
-      let callResult = new CallResult(result.output.answered == true, result.output.positive_or_negative == true, result.output.ask_call_later == true, result.recordingUrl)
+      console.log(result)
+      let callResult = new CallResult(result.output.answered == true, result.output.positive_or_negative == true, result.output.ask_call_later == true, result.recordingUrl?result.recordingUrl:"")
       return callResult
     }
 
