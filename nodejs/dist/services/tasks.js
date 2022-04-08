@@ -327,7 +327,7 @@ var TasksService = /** @class */ (function () {
                     case 6:
                         _a.sent();
                         console.log(result);
-                        callResult = new callResult_1.default(result.output.answered == true, result.output.positive_or_negative == true, result.output.ask_call_later == true, result.recordingUrl);
+                        callResult = new callResult_1.default(result.output.answered == true, result.output.positive_or_negative == true, result.output.ask_call_later == true, result.recordingUrl ? result.recordingUrl : "");
                         return [2 /*return*/, callResult];
                 }
             });
