@@ -123,7 +123,7 @@ export default class TasksService {
       this.running = true
       var callsList = await this.repository.tasks.getTasksToCall()
 
-      await this.dashaApi.start({concurrency:10});
+      await this.dashaApi.start({concurrency:7});
       await Promise.all(callsList.map(async (task) => {
         let scenario = await this.repository.scenarios.getById(task.scenarioID!)
         if (scenario) {
