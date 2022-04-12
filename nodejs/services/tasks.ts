@@ -51,7 +51,7 @@ export default class TasksService {
         this.audio = new AudioResources();
         this.audio.addFolder("audio");
 
-        dasha.deploy('./dasha').then((dashaDep: dasha.Application<Record<string, unknown>, Record<string, unknown>>)=>{
+        dasha.deploy('./dasha', { groupName: 'Default' }).then((dashaDep: dasha.Application<Record<string, unknown>, Record<string, unknown>>)=>{
             this.dashaApi = dashaDep
 
             //провайдер аудиозаписей

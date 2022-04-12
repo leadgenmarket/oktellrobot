@@ -285,7 +285,7 @@ var TasksService = /** @class */ (function () {
         //инициализируем папку с аудио
         this.audio = new customTts_1.default();
         this.audio.addFolder("audio");
-        dasha.deploy('./dasha').then(function (dashaDep) {
+        dasha.deploy('./dasha', { groupName: 'Default' }).then(function (dashaDep) {
             _this.dashaApi = dashaDep;
             //провайдер аудиозаписей
             _this.dashaApi.customTtsProvider = function (text, voice) { return __awaiter(_this, void 0, void 0, function () {
