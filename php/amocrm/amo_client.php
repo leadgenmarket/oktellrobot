@@ -39,7 +39,7 @@ class LeadgenAmoClient {
     protected $apiClient;
    
 
-    function __construct(string $baseDomain, string $clientId, string $clientSecret, string $redirectUri) {
+    function __construct(string $baseDomain, string $clientId, string $clientSecret, string $redirectUri, bool $refresh) {
         try {
             $apiClient = new AmoCRMApiClient($clientId, $clientSecret, $redirectUri);
             $accessToken = $this->getToken();
@@ -58,7 +58,7 @@ class LeadgenAmoClient {
                 }
               );
         
-            if ($accessToken->hasExpired()) {
+            if ($accessToken->hasExpired() || $refresh) {
               try {
                 $accessToken = $apiClient->getOAuthClient()->getAccessTokenByRefreshToken($accessToken);
                 
@@ -86,6 +86,64 @@ class LeadgenAmoClient {
     {
       $lead = $this->apiClient->leads()->getOne($leadID, [LeadModel::CONTACTS, LeadModel::CATALOG_ELEMENTS]);
       return $lead;
+    }
+
+    //добавляем лид в crm
+    public function addLeadToCrm(string $phone, int $status, string $city) {
+      $resp = 2614462;
+      $leadName = "Сделка входящий звонок (Даша)";
+      try{
+        $contact = new ContactModel();
+        $contact->setResponsibleUserId($resp);
+        $customFields = new CustomFieldsValuesCollection();
+        $phoneField = (new MultitextCustomFieldValuesModel())->setFieldCode('PHONE');
+        $phoneField->setValues(
+          (new MultitextCustomFieldValueCollection())
+            ->add(
+              (new MultitextCustomFieldValueModel())
+                ->setEnum('MOB')
+                ->setValue($phone)
+            )
+        );
+        $customFields->add($phoneField);
+        $contact->setCustomFieldsValues($customFields);
+        $apiContact = $this->apiClient->contacts()->addOne($contact);
+        $contactId = $apiContact->getId();
+        $lead = new LeadModel();
+        $leadCustomFieldsValues  = new CustomFieldsValuesCollection();
+        $lead
+          ->setName($leadName)
+          ->setStatusId($status)
+          ->setResponsibleUserId($resp);
+        $cityNameCustomFieldsValues  = new TextCustomFieldValuesModel();
+        $cityNameCustomFieldsValues
+          ->setFieldId(416699)
+          ->setValues(
+            (new TextCustomFieldValueCollection())
+              ->add((new TextCustomFieldValueModel())->setValue($city))
+          );
+        $cityNameCustomFieldsValues2  = new TextCustomFieldValuesModel();
+        $cityNameCustomFieldsValues2
+          ->setFieldId(467915)
+          ->setValues(
+            (new TextCustomFieldValueCollection())
+              ->add((new TextCustomFieldValueModel())->setValue($city))
+          );
+        
+        $leadCustomFieldsValues
+          ->add($cityNameCustomFieldsValues)
+          ->add($cityNameCustomFieldsValues2);
+        
+        $lead->setCustomFieldsValues($leadCustomFieldsValues);
+        $apiLead = $this->apiClient->leads()->addOne($lead);
+        $links = new LinksCollection();
+        $links->add($apiContact);
+        $this->apiClient->leads()->link($lead, $links);
+        return $apiLead;
+      } catch (\Exception $e) {
+        echo "<pre>";var_dump($e);echo "</pre>";
+        return false;
+      }
     }
 
     //добавляет комментарий к лиду
