@@ -10,7 +10,7 @@ services:
       - app-net
     volumes:
       - './data:/data/db'
-  app-node:
+  outbound:
     build:
       context: ./nodejs
     ports:
@@ -19,13 +19,28 @@ services:
     restart: always
     networks:
       - app-net
-    container_name: app
+    container_name: outbound
     environment:
       APP_PORT: ${APP_PORT}
       APP_DSN: ${APP_DSN}
       APP_LOG_LEVEL: ${APP_LOG_LEVEL}
       DASHA_APIKEY: ${DASHA_APIKEY}
       DASHA_SERVER: ${DASHA_SERVER}
+      APP_TYPE: outbound
+  inbound:
+    build:
+      context: ./nodejs
+    restart: always
+    networks:
+      - app-net
+    container_name: inbound
+    environment:
+      APP_PORT: ${APP_PORT}
+      APP_DSN: ${APP_DSN}
+      APP_LOG_LEVEL: ${APP_LOG_LEVEL}
+      DASHA_APIKEY: ${DASHA_APIKEY}
+      DASHA_SERVER: ${DASHA_SERVER}
+      APP_TYPE: inbound
   nginx:
     image: nginx:latest
     ports:

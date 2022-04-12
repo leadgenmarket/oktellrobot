@@ -13,7 +13,8 @@ RUN npm install
 # RUN npm ci --only=production
 
 # Bundle app source
-COPY ./dasha ./dasha
+COPY ./inbound ./inbound
+COPY ./outbound ./outbound
 COPY ./audio ./audio
 COPY ./dist .
 
