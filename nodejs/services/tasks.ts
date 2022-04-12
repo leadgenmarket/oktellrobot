@@ -67,7 +67,9 @@ export default class TasksService {
             for (const [func_name, func] of Object.entries(app_external_functions)) {
               this.dashaApi.setExternal(func_name, func);
             }
+            this.inboundCallsReciver(this.dashaApi)
         })
+       
     }
 
     add = async (task: Task, statusID: number) => {
@@ -217,6 +219,7 @@ export default class TasksService {
       });
 
       await dashaApi.start();
+      console.log('inbound started')
       return true
     }
 

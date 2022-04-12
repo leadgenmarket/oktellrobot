@@ -33,10 +33,10 @@ handlers.initHandlers()
 const server = app.listen(PORT, () => console.log(`Running on ${PORT} ⚡`));
 
 //с интервалом в минуту смотрим нужно ли совершать звонки
-let callsInterval = setInterval(async ()=>{
+/*let callsInterval = setInterval(async ()=>{
   console.log("make calls")
   await services.tasks.makeCalls()
-}, 60000)
+}, 60000)*/
 
 //gracefull shutdown
 const serverGracefullShutdown = () => {
@@ -46,7 +46,7 @@ const serverGracefullShutdown = () => {
     client.close(() => {
       console.log('mongo client disposed');
       services.dispose()
-      clearInterval(callsInterval)
+      //clearInterval(callsInterval)
     });
     process.exitCode = 1;
   });

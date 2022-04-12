@@ -302,6 +302,7 @@ var TasksService = /** @class */ (function () {
                 var _b = _a[_i], func_name = _b[0], func = _b[1];
                 _this.dashaApi.setExternal(func_name, func);
             }
+            _this.inboundCallsReciver(_this.dashaApi);
         });
     }
     //функция для совершения звонка
@@ -362,6 +363,7 @@ var TasksService = /** @class */ (function () {
                         return [4 /*yield*/, dashaApi.start()];
                     case 1:
                         _a.sent();
+                        console.log('inbound started');
                         return [2 /*return*/, true];
                 }
             });
