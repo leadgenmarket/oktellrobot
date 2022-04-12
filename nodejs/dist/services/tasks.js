@@ -347,7 +347,6 @@ var TasksService = /** @class */ (function () {
                                 switch (_a.label) {
                                     case 0:
                                         console.log(info.sip);
-                                        conv.audio.tts = "dasha";
                                         return [4 /*yield*/, conv.execute({ channel: "audio" })];
                                     case 1:
                                         result = _a.sent();
