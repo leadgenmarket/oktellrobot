@@ -206,11 +206,6 @@ export default class TasksService {
 
     //входящие звонки
     protected async inboundCallsReciver(dashaApi: dasha.Application<Record<string, unknown>, Record<string, unknown>>):Promise<boolean> {
-      if (this.dashaApi == null) {
-        console.log("not initialized yet")
-        return false
-      }
-
       dashaApi.queue.on("ready", async (key, conv, info) => {
         console.log(info.sip);
         conv.audio.tts = "dasha";
