@@ -1,7 +1,7 @@
 {
 
     "formatVersion": "2",
-    "name": "sip-inbound-calls",
+    "name": "sip_mtt",
     "description": "sip test application",
     "nlu": {
     "language": "ru-RU",
