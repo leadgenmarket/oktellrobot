@@ -2,9 +2,6 @@ import "commonReactions/all.dsl";
 import "types.dsl";
 context
 {
-    input phone: string;
-    input city: string;
-    input outbound: boolean;
     output positive_or_negative: boolean = false;
     output answered: boolean = false;
     output ask_call_later: boolean = false;
@@ -17,14 +14,8 @@ start node root
 {
     do
     {
-        if ($outbound){
-            //исходящие
-            #connectSafe($phone);
-            #waitForSpeech(1000);
-        } else {
-            //входящие
-            #connectSafe("");
-        }
+
+        #connectSafe("");
         #say("hello");
         wait *;
     }
@@ -37,17 +28,7 @@ start node root
 node greet {
     do
     {
-        if (!$outbound) {
-            #say("greet_simple");
-        } else if ($city == "новосибирск") {
-            #say("greeting_nsk");
-        } else if ($city == "санкт-петербург") {
-            #say("greeting_spb");
-        } else if ($city == "ростов-на-дону") {
-            #say("greeting_rnd");
-        } else {
-            #say("greeting_msk");
-        }
+        #say("greet_simple");
         set $answered=true;
         wait *;
     }
@@ -64,17 +45,8 @@ node who_are_you {
     do
     {
         
-        if ($outbound == false) {
-            #say("who_are_you");
-        } else if ($city == "новосибирск") {
-            #say("who_are_you_nsk");
-        } else if ($city == "санкт-петербург") {
-            #say("who_are_you_spb");
-        } else if ($city == "ростов-на-дону") {
-            #say("who_are_you_rnd");
-        } else {
-            #say("who_are_you_msk");
-        }
+       
+        #say("who_are_you");
         goto do_you_want_to_buy;
     }
     transitions
@@ -118,16 +90,10 @@ node succees
     {
         
         set $positive_or_negative=true;
-        if ($outbound) {
-            //если исходящий, то говорим спасибо и выходим
-            #say("success");
-            exit;
-        } else {
-            //если входящий, то спращиваем город
-            #say("city_question");
-            wait *;
-            exit;
-        }
+        //если входящий, то спращиваем город
+        #say("city_question");
+        wait *;
+        exit;
     }
     transitions
     {
