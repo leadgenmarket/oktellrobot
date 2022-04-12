@@ -7,7 +7,11 @@ import Logger from "../utils/logger";
 const fs = require('fs');
 import AudioResources from "../utils/customTts"
 import CallResult from "../domain/callResult";
+import CityInfo from "../domain/cityInfo";
 import checkTime from "../utils/checkTime";
+
+const defaultSuccessStatus = 47172544
+const defaultDiscardStatus = 47172547
 
 const citiesList: {[key:string]:string[]} = {
   "Санкт-Петербург": [
@@ -17,6 +21,8 @@ const citiesList: {[key:string]:string[]} = {
     "санкт-петербург",
     "санктпетербург",
     "в санктпетербурге",
+    "санкт петербург",
+    "в санкт петербурге",
     "санкт",
     "в питере"
   ],
@@ -45,20 +51,18 @@ export default class TasksService {
     audio: AudioResources
     running: boolean = false
 
-    constructor(repo: Repositories) {
+    constructor(repo: Repositories, outbound: boolean) {
         this.repository = repo
         //инициализируем папку с аудио
         this.audio = new AudioResources();
         this.audio.addFolder("audio");
 
-        dasha.deploy('./dasha', { groupName: 'Default' }).then((dashaDep: dasha.Application<Record<string, unknown>, Record<string, unknown>>)=>{
+        dasha.deploy(outbound?"./outbound":'./inbound', { groupName: 'Default' }).then((dashaDep: dasha.Application<Record<string, unknown>, Record<string, unknown>>)=>{
             this.dashaApi = dashaDep
-
             //провайдер аудиозаписей
             this.dashaApi.customTtsProvider = async (text, voice) => {
               console.log(`Tts asking for phrase with text ${text} and voice ${JSON.stringify(voice)}`);
               const fname = this.audio.GetPath(text, voice);
-      
               console.log(`Found in file ${fname}`);
               return dasha.audio.fromFile(fname);
             };
@@ -67,9 +71,10 @@ export default class TasksService {
             for (const [func_name, func] of Object.entries(app_external_functions)) {
               this.dashaApi.setExternal(func_name, func);
             }
-            this.inboundCallsReciver(this.dashaApi)
-        })
-       
+            if (!outbound) {
+              this.inboundCallsReciver(this.dashaApi)
+            }
+        })  
     }
 
     add = async (task: Task, statusID: number) => {
@@ -169,6 +174,33 @@ export default class TasksService {
       return true
     }
 
+    processInboundCall = async (callResult: CallResult) =>{
+      //ищем таску, по входящему номеру
+      var task = await this.repository.tasks.getUnfinishedTaskByPhone(callResult.getPhoneNumber()!)
+      if (task!= null) {
+        //таска есть, добавляем коммент в нее
+        let scenario = await this.repository.scenarios.getById(task.scenarioID!)
+        if (scenario!=null) {
+          console.log('таска есть, добавляем коммент')
+          if (callResult.isSuccess()) {
+            await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario?scenario.successStatus:defaultSuccessStatus, `Клиент перезвонил и ответил - ДА (сценарий - ${scenario.name}), запись - ${callResult.getRecordingURL()})`))
+          } else {
+            await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario?scenario.discardStatus:defaultDiscardStatus, `Клиент перезвонил и ответил - НЕТ (сценарий - ${scenario.name}), запись - ${callResult.getRecordingURL()})`))
+          }
+        }
+        task.finished = true
+        task.success = callResult.isSuccess()
+        await this.repository.tasks.update(task)
+      } else {
+        //таски нет, создаем лид
+        if (callResult.isSuccess()) {
+          await this.repository.amoBuffer.add(new AmoBuffer("", 0, 0, "", callResult.getPhoneNumber(), defaultSuccessStatus, `Входящий звонок, клиент сам позвонил и ответил ДА, номер не найден в списке текущих обзвонов, запись - ${callResult.getRecordingURL()})`, callResult.getCityInfo()))
+        } else {
+          await this.repository.amoBuffer.add(new AmoBuffer("", 0, 0, "", callResult.getPhoneNumber(), defaultDiscardStatus, `Входящий звонок, клиент сам позвонил и ответил НЕТ, номер не найден в списке текущих обзвонов, запись - ${callResult.getRecordingURL()})`, callResult.getCityInfo()))
+        }
+      }
+    }
+
     formatPhone = (phoneInput: string) => {
       let phone  = phoneInput.replace(/[^0-9\.]+/g, '')
       if (phone[0] == '8') {
@@ -207,9 +239,27 @@ export default class TasksService {
     //входящие звонки
     protected async inboundCallsReciver(dashaApi: dasha.Application<Record<string, unknown>, Record<string, unknown>>):Promise<boolean> {
       dashaApi.queue.on("ready", async (key, conv, info) => {
-        console.log(info.sip);
-        const result = await conv.execute({ channel: "audio" });
-        console.log(result.output);
+        let phone = info.sip?.fromUser
+        if (phone){
+          conv.audio.tts = "custom";
+          const result = await conv.execute({ channel: "audio" });
+          let city = ""
+          try {
+            if (result.output.cityInfo) {
+              let cityInfo = new CityInfo(result.output.cityInfo)
+                if (cityInfo.getCityName()!="") {
+                  city = cityInfo.getCityName()
+                } else {
+                  city = cityInfo.getInputs().join(',')
+                }
+            }
+          } catch (e){
+            console.log(e)
+          }
+          let callResult = new CallResult(result.output.answered == true, result.output.positive_or_negative == true, result.output.ask_call_later == true, result.recordingUrl?result.recordingUrl:"", phone, city)
+          console.log(callResult);
+          await this.processInboundCall(callResult)
+        }
       });
 
       await dashaApi.start();

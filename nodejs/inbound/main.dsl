@@ -88,9 +88,7 @@ node succees
 {
     do
     {
-        
         set $positive_or_negative=true;
-        //если входящий, то спращиваем город
         #say("city_question");
         wait *;
         exit;

@@ -6,14 +6,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var scenarios_1 = __importDefault(require("./scenarios"));
 var tasks_1 = __importDefault(require("./tasks"));
 var Services = /** @class */ (function () {
-    function Services(repos) {
+    function Services(repos, outbound) {
         var _this = this;
         this.dispose = function () {
             var _a;
             (_a = _this.tasks.dashaApi) === null || _a === void 0 ? void 0 : _a.dispose();
         };
         this.scenarios = new scenarios_1.default(repos.scenarios);
-        this.tasks = new tasks_1.default(repos);
+        this.tasks = new tasks_1.default(repos, outbound);
     }
     return Services;
 }());

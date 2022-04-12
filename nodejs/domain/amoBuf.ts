@@ -10,9 +10,10 @@ export default class AmoBuffer {
     taskID: string //id таски(задания) на обзвон
     phone?: string
     newStatus?: number
-    comment?: string 
+    comment?: string
+    city?: string
 
-    constructor(id: string, type: number, leadID: number, taskID: string, phone?:string, newStatus?:number, comment?: string){
+    constructor(id: string, type: number, leadID: number, taskID: string, phone?:string, newStatus?:number, comment?: string, city?:string){
         if (id !== "") {
             if (ObjectId.isValid(id)){
                 this._id = new ObjectId(id)
@@ -26,5 +27,6 @@ export default class AmoBuffer {
         this.phone = phone
         this.newStatus = newStatus
         this.comment = comment
+        this.city = city
     }
 }

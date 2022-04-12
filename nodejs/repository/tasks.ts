@@ -35,6 +35,16 @@ export default class TasksRepository {
         return tasks
     }
 
+    getUnfinishedTaskByPhone = async (phone: string): Promise<Task| null> => {
+        let phoneS = phone.substring(1)
+        const result: mongoDB.WithId<mongoDB.Document> | null = await this.collection.findOne({phone: {$regex : phoneS}, finished: false})
+        let task: Task | null = null
+        if (result!=null) {
+            task = this.convertDocumentToTask(result)
+        }
+        return task
+    }
+
     convertDocumentToTask = (document: mongoDB.Document): Task =>{
         let task = new Task(document._id, document.leadID, document.scenarioID, document.phone, document.cityName, document.tries, document.nextCallTime, document.success, document.finished)
         return task

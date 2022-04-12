@@ -64,7 +64,10 @@ var logger_1 = __importDefault(require("../utils/logger"));
 var fs = require('fs');
 var customTts_1 = __importDefault(require("../utils/customTts"));
 var callResult_1 = __importDefault(require("../domain/callResult"));
+var cityInfo_1 = __importDefault(require("../domain/cityInfo"));
 var checkTime_1 = __importDefault(require("../utils/checkTime"));
+var defaultSuccessStatus = 47172544;
+var defaultDiscardStatus = 47172547;
 var citiesList = {
     "Санкт-Петербург": [
         "в спб",
@@ -73,6 +76,8 @@ var citiesList = {
         "санкт-петербург",
         "санктпетербург",
         "в санктпетербурге",
+        "санкт петербург",
+        "в санкт петербурге",
         "санкт",
         "в питере"
     ],
@@ -94,7 +99,7 @@ var citiesList = {
     ]
 };
 var TasksService = /** @class */ (function () {
-    function TasksService(repo) {
+    function TasksService(repo, outbound) {
         var _this = this;
         this.dashaApi = null;
         this.running = false;
@@ -256,6 +261,49 @@ var TasksService = /** @class */ (function () {
                 }
             });
         }); };
+        this.processInboundCall = function (callResult) { return __awaiter(_this, void 0, void 0, function () {
+            var task, scenario;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.repository.tasks.getUnfinishedTaskByPhone(callResult.getPhoneNumber())];
+                    case 1:
+                        task = _a.sent();
+                        if (!(task != null)) return [3 /*break*/, 8];
+                        return [4 /*yield*/, this.repository.scenarios.getById(task.scenarioID)];
+                    case 2:
+                        scenario = _a.sent();
+                        if (!(scenario != null)) return [3 /*break*/, 6];
+                        console.log('таска есть, добавляем коммент');
+                        if (!callResult.isSuccess()) return [3 /*break*/, 4];
+                        return [4 /*yield*/, this.repository.amoBuffer.add(new amoBuf_1.default("", 1, task.leadID, "", task.phone, scenario ? scenario.successStatus : defaultSuccessStatus, "\u041A\u043B\u0438\u0435\u043D\u0442 \u043F\u0435\u0440\u0435\u0437\u0432\u043E\u043D\u0438\u043B \u0438 \u043E\u0442\u0432\u0435\u0442\u0438\u043B - \u0414\u0410 (\u0441\u0446\u0435\u043D\u0430\u0440\u0438\u0439 - " + scenario.name + "), \u0437\u0430\u043F\u0438\u0441\u044C - " + callResult.getRecordingURL() + ")"))];
+                    case 3:
+                        _a.sent();
+                        return [3 /*break*/, 6];
+                    case 4: return [4 /*yield*/, this.repository.amoBuffer.add(new amoBuf_1.default("", 1, task.leadID, "", task.phone, scenario ? scenario.discardStatus : defaultDiscardStatus, "\u041A\u043B\u0438\u0435\u043D\u0442 \u043F\u0435\u0440\u0435\u0437\u0432\u043E\u043D\u0438\u043B \u0438 \u043E\u0442\u0432\u0435\u0442\u0438\u043B - \u041D\u0415\u0422 (\u0441\u0446\u0435\u043D\u0430\u0440\u0438\u0439 - " + scenario.name + "), \u0437\u0430\u043F\u0438\u0441\u044C - " + callResult.getRecordingURL() + ")"))];
+                    case 5:
+                        _a.sent();
+                        _a.label = 6;
+                    case 6:
+                        task.finished = true;
+                        task.success = callResult.isSuccess();
+                        return [4 /*yield*/, this.repository.tasks.update(task)];
+                    case 7:
+                        _a.sent();
+                        return [3 /*break*/, 12];
+                    case 8:
+                        if (!callResult.isSuccess()) return [3 /*break*/, 10];
+                        return [4 /*yield*/, this.repository.amoBuffer.add(new amoBuf_1.default("", 0, 0, "", callResult.getPhoneNumber(), defaultSuccessStatus, "\u0412\u0445\u043E\u0434\u044F\u0449\u0438\u0439 \u0437\u0432\u043E\u043D\u043E\u043A, \u043A\u043B\u0438\u0435\u043D\u0442 \u0441\u0430\u043C \u043F\u043E\u0437\u0432\u043E\u043D\u0438\u043B \u0438 \u043E\u0442\u0432\u0435\u0442\u0438\u043B \u0414\u0410, \u043D\u043E\u043C\u0435\u0440 \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D \u0432 \u0441\u043F\u0438\u0441\u043A\u0435 \u0442\u0435\u043A\u0443\u0449\u0438\u0445 \u043E\u0431\u0437\u0432\u043E\u043D\u043E\u0432, \u0437\u0430\u043F\u0438\u0441\u044C - " + callResult.getRecordingURL() + ")", callResult.getCityInfo()))];
+                    case 9:
+                        _a.sent();
+                        return [3 /*break*/, 12];
+                    case 10: return [4 /*yield*/, this.repository.amoBuffer.add(new amoBuf_1.default("", 0, 0, "", callResult.getPhoneNumber(), defaultDiscardStatus, "\u0412\u0445\u043E\u0434\u044F\u0449\u0438\u0439 \u0437\u0432\u043E\u043D\u043E\u043A, \u043A\u043B\u0438\u0435\u043D\u0442 \u0441\u0430\u043C \u043F\u043E\u0437\u0432\u043E\u043D\u0438\u043B \u0438 \u043E\u0442\u0432\u0435\u0442\u0438\u043B \u041D\u0415\u0422, \u043D\u043E\u043C\u0435\u0440 \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D \u0432 \u0441\u043F\u0438\u0441\u043A\u0435 \u0442\u0435\u043A\u0443\u0449\u0438\u0445 \u043E\u0431\u0437\u0432\u043E\u043D\u043E\u0432, \u0437\u0430\u043F\u0438\u0441\u044C - " + callResult.getRecordingURL() + ")", callResult.getCityInfo()))];
+                    case 11:
+                        _a.sent();
+                        _a.label = 12;
+                    case 12: return [2 /*return*/];
+                }
+            });
+        }); };
         this.formatPhone = function (phoneInput) {
             var phone = phoneInput.replace(/[^0-9\.]+/g, '');
             if (phone[0] == '8') {
@@ -285,7 +333,7 @@ var TasksService = /** @class */ (function () {
         //инициализируем папку с аудио
         this.audio = new customTts_1.default();
         this.audio.addFolder("audio");
-        dasha.deploy('./dasha', { groupName: 'Default' }).then(function (dashaDep) {
+        dasha.deploy(outbound ? "./outbound" : './inbound', { groupName: 'Default' }).then(function (dashaDep) {
             _this.dashaApi = dashaDep;
             //провайдер аудиозаписей
             _this.dashaApi.customTtsProvider = function (text, voice) { return __awaiter(_this, void 0, void 0, function () {
@@ -302,7 +350,9 @@ var TasksService = /** @class */ (function () {
                 var _b = _a[_i], func_name = _b[0], func = _b[1];
                 _this.dashaApi.setExternal(func_name, func);
             }
-            _this.inboundCallsReciver(_this.dashaApi);
+            if (!outbound) {
+                _this.inboundCallsReciver(_this.dashaApi);
+            }
         });
     }
     //функция для совершения звонка
@@ -342,16 +392,39 @@ var TasksService = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         dashaApi.queue.on("ready", function (key, conv, info) { return __awaiter(_this, void 0, void 0, function () {
-                            var result;
-                            return __generator(this, function (_a) {
-                                switch (_a.label) {
+                            var phone, result, city, cityInfo, callResult;
+                            var _a;
+                            return __generator(this, function (_b) {
+                                switch (_b.label) {
                                     case 0:
-                                        console.log(info.sip);
+                                        phone = (_a = info.sip) === null || _a === void 0 ? void 0 : _a.fromUser;
+                                        if (!phone) return [3 /*break*/, 3];
+                                        conv.audio.tts = "custom";
                                         return [4 /*yield*/, conv.execute({ channel: "audio" })];
                                     case 1:
-                                        result = _a.sent();
-                                        console.log(result.output);
-                                        return [2 /*return*/];
+                                        result = _b.sent();
+                                        city = "";
+                                        try {
+                                            if (result.output.cityInfo) {
+                                                cityInfo = new cityInfo_1.default(result.output.cityInfo);
+                                                if (cityInfo.getCityName() != "") {
+                                                    city = cityInfo.getCityName();
+                                                }
+                                                else {
+                                                    city = cityInfo.getInputs().join(',');
+                                                }
+                                            }
+                                        }
+                                        catch (e) {
+                                            console.log(e);
+                                        }
+                                        callResult = new callResult_1.default(result.output.answered == true, result.output.positive_or_negative == true, result.output.ask_call_later == true, result.recordingUrl ? result.recordingUrl : "", phone, city);
+                                        console.log(callResult);
+                                        return [4 /*yield*/, this.processInboundCall(callResult)];
+                                    case 2:
+                                        _b.sent();
+                                        _b.label = 3;
+                                    case 3: return [2 /*return*/];
                                 }
                             });
                         }); });

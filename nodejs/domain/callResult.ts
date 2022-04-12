@@ -3,11 +3,15 @@ class CallResult{
     protected askedToCallLater: boolean
     protected answered: boolean
     protected recordingURL?: string
-    constructor(answered: boolean, success: boolean, askedToCallLater: boolean, recordingURL?: string){
+    protected phoneNumber?: string
+    protected cityInfo?:string
+    constructor(answered: boolean, success: boolean, askedToCallLater: boolean, recordingURL?: string, phoneNumber?:string, cityInfo?: string){
         this.answered = answered
         this.askedToCallLater = askedToCallLater
         this.success = success
         this.recordingURL = recordingURL
+        this.phoneNumber = phoneNumber
+        this.cityInfo = cityInfo
     }
 
     isAnswered = () => {
@@ -24,6 +28,13 @@ class CallResult{
     
     getRecordingURL(){
         return this.recordingURL
+    }
+    getPhoneNumber(){
+        return this.phoneNumber
+    }
+
+    getCityInfo(){
+        return this.cityInfo
     }
 }
 

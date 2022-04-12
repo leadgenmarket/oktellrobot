@@ -120,6 +120,23 @@ var TasksRepository = /** @class */ (function () {
                 }
             });
         }); };
+        this.getUnfinishedTaskByPhone = function (phone) { return __awaiter(_this, void 0, void 0, function () {
+            var phoneS, result, task;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        phoneS = phone.substring(1);
+                        return [4 /*yield*/, this.collection.findOne({ phone: { $regex: phoneS }, finished: false })];
+                    case 1:
+                        result = _a.sent();
+                        task = null;
+                        if (result != null) {
+                            task = this.convertDocumentToTask(result);
+                        }
+                        return [2 /*return*/, task];
+                }
+            });
+        }); };
         this.convertDocumentToTask = function (document) {
             var task = new tasks_1.default(document._id, document.leadID, document.scenarioID, document.phone, document.cityName, document.tries, document.nextCallTime, document.success, document.finished);
             return task;
