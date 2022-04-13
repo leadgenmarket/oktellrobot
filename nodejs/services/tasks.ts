@@ -41,6 +41,12 @@ const citiesList: {[key:string]:string[]} = {
     "новосиб",
     "новосибе",
     "новосибирске"
+  ],
+  "Краснодар": [
+    "крд",
+    "краснодар",
+    "краснодаре",
+    "в краснодаре"
   ]
 }
 
@@ -262,7 +268,7 @@ export default class TasksService {
         }
       });
 
-      await dashaApi.start();
+      await dashaApi.start({concurrency:7});
       console.log('inbound started')
       return true
     }
