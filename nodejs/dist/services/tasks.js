@@ -96,6 +96,12 @@ var citiesList = {
         "новосиб",
         "новосибе",
         "новосибирске"
+    ],
+    "Краснодар": [
+        "крд",
+        "краснодар",
+        "краснодаре",
+        "в краснодаре"
     ]
 };
 var TasksService = /** @class */ (function () {
@@ -428,7 +434,7 @@ var TasksService = /** @class */ (function () {
                                 }
                             });
                         }); });
-                        return [4 /*yield*/, dashaApi.start()];
+                        return [4 /*yield*/, dashaApi.start({ concurrency: 7 })];
                     case 1:
                         _a.sent();
                         console.log('inbound started');
