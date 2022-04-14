@@ -76,7 +76,7 @@ class LeadgenAmoClient {
             $apiClient->setAccessToken($accessToken);
           } catch (AmoCRMApiException $e) {
             echo "<pre>";var_dump($e);echo"</pre>";
-            die;
+            //die;
           }
           $this->apiClient = $apiClient;
     }
