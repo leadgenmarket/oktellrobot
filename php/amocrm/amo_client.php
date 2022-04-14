@@ -138,7 +138,7 @@ class LeadgenAmoClient {
         $links->add($apiContact);
         $this->apiClient->leads()->link($lead, $links);
         return $apiLead;
-      } catch (\Exception $e) {
+      } catch (\Throwable $e) {
         echo "<pre>";var_dump($e);echo "</pre>";
         return false;
       }
@@ -166,7 +166,7 @@ class LeadgenAmoClient {
         $leadsCollection->add($lead);
         $this->apiClient->leads()->update($leadsCollection);
         return true;
-      } catch (AmoCRMApiException $e) {
+      } catch (\Throwable $e) {
         return false;
       }
     }
@@ -210,7 +210,7 @@ class LeadgenAmoClient {
 
 
         $leads = $this->apiClient->leads()->get($filter, [LeadModel::IS_PRICE_BY_ROBOT, LeadModel::LOSS_REASON, LeadModel::CONTACTS]);
-      } catch (AmoCRMApiException $e) {
+      } catch (\Throwable $e) {
         printError($e);
       }
       return $leads;
