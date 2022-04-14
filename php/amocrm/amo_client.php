@@ -70,13 +70,11 @@ class LeadgenAmoClient {
                 ]);
               } catch (Exception $e) {
                 echo "<pre>";var_dump($e);echo"</pre>";
-                //die((string)$e);
               }
             }
             $apiClient->setAccessToken($accessToken);
           } catch (AmoCRMApiException $e) {
             echo "<pre>";var_dump($e);echo"</pre>";
-            //die;
           }
           $this->apiClient = $apiClient;
     }
