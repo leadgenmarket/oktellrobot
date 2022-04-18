@@ -30,6 +30,7 @@ node greet {
     {
         #say("greet_simple");
         set $answered=true;
+        #setVadPauseLength(1.5);
         wait *;
     }
     transitions
