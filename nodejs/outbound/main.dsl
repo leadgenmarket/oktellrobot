@@ -39,7 +39,6 @@ node greet {
             #say("greeting_msk");
         }
         set $answered=true;
-        #setVadPauseLength(1.5);
         wait *;
     }
     transitions
