@@ -131,6 +131,12 @@ class LeadgenAmoClient {
         $leadCustomFieldsValues
           ->add($cityNameCustomFieldsValues)
           ->add($cityNameCustomFieldsValues2);
+
+        $tagsCollection = new TagsCollection();
+        $tag = new TagModel();
+        $tag->setName("Даша");
+        $tagsCollection->add($tag);
+        $lead->setTags($tagsCollection);
         
         $lead->setCustomFieldsValues($leadCustomFieldsValues);
         $apiLead = $this->apiClient->leads()->addOne($lead);
