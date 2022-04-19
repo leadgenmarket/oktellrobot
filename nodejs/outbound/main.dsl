@@ -43,8 +43,8 @@ node greet {
     }
     transitions
     {
-        positive: goto succees on #messageHasSentiment("positive");
         negative: goto negative on #messageHasIntent("negative");
+        positive: goto succees on #messageHasSentiment("positive");
         who_are_you: goto who_are_you on #messageHasIntent("who_are_you");
         number_question: goto number_question on #messageHasIntent("number_question");
     } 
@@ -79,8 +79,8 @@ node number_question {
     }
     transitions
     {
-        positive: goto succees on #messageHasSentiment("positive");
         negative: goto negative on #messageHasIntent("negative");
+        positive: goto succees on #messageHasSentiment("positive");
         who_are_you: goto who_are_you on #messageHasIntent("who_are_you");
     }
 }
@@ -93,8 +93,8 @@ node do_you_want_to_buy {
     }
     transitions
     {
-        positive: goto succees on #messageHasSentiment("positive");
         negative: goto negative on #messageHasIntent("negative");
+        positive: goto succees on #messageHasSentiment("positive");
         who_are_you: goto who_are_you on #messageHasIntent("who_are_you");
         number_question: goto number_question on #messageHasIntent("number_question");
     }
