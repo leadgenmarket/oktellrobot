@@ -247,9 +247,11 @@ export default class TasksService {
       dashaApi.queue.on("ready", async (key, conv, info) => {
         let phone = info.sip?.fromUser
         if (phone){
+          conv.on('transcription', console.log);
           conv.audio.tts = "custom";
           const result = await conv.execute({ channel: "audio" });
           let city = ""
+          
           try {
             if (result.output.cityInfo) {
               let cityInfo = new CityInfo(result.output.cityInfo)

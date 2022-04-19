@@ -16,6 +16,7 @@ start node root
     {
 
         #connectSafe("");
+        #waitForSpeech(1000);
         #say("greet_simple");
         set $answered=true;
         wait *;

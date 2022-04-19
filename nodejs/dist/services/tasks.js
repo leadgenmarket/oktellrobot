@@ -405,6 +405,7 @@ var TasksService = /** @class */ (function () {
                                     case 0:
                                         phone = (_a = info.sip) === null || _a === void 0 ? void 0 : _a.fromUser;
                                         if (!phone) return [3 /*break*/, 3];
+                                        conv.on('transcription', console.log);
                                         conv.audio.tts = "custom";
                                         return [4 /*yield*/, conv.execute({ channel: "audio" })];
                                     case 1:
