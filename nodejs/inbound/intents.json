@@ -1,6 +1,16 @@
 {
   "version": "v2",
   "intents": {
+    "negative": {
+      "includes":[
+        "нет", 
+        "не надо", 
+        "no", 
+        "net", 
+        "не нужно", 
+        "не"
+      ]
+    },
     "who_are_you": {
       "includes": [
         "вы кто",
