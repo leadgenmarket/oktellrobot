@@ -16,18 +16,6 @@ start node root
     {
 
         #connectSafe("");
-        #say("hello");
-        wait *;
-    }
-    transitions
-    {
-        greet: goto greet on true;
-    }
-}
-
-node greet {
-    do
-    {
         #say("greet_simple");
         set $answered=true;
         wait *;
@@ -38,7 +26,7 @@ node greet {
         who_are_you: goto who_are_you on #messageHasIntent("who_are_you");
         number_question: goto number_question on #messageHasIntent("number_question");
         positive: goto succees on #messageHasSentiment("positive");
-    } 
+    }
 }
 
 node who_are_you {

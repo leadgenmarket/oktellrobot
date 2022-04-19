@@ -17,18 +17,6 @@ start node root
     {
         #connectSafe($phone);
         #waitForSpeech(1000);
-        #say("hello");
-        wait *;
-    }
-    transitions
-    {
-        greet: goto greet on true;
-    }
-}
-
-node greet {
-    do
-    {
         if ($city == "новосибирск") {
             #say("greeting_nsk");
         } else if ($city == "санкт-петербург") {
@@ -47,13 +35,12 @@ node greet {
         who_are_you: goto who_are_you on #messageHasIntent("who_are_you");
         number_question: goto number_question on #messageHasIntent("number_question");
         positive: goto succees on #messageHasSentiment("positive");
-    } 
+    }
 }
 
 node who_are_you {
     do
     {
-        
         if ($city == "новосибирск") {
             #say("who_are_you_nsk");
         } else if ($city == "санкт-петербург") {
