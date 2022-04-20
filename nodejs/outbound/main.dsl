@@ -16,7 +16,19 @@ start node root
     do
     {
         #connectSafe($phone);
-        #waitForSpeech(1000);
+        #waitForSpeech(2000);
+        wait *;
+    }
+    transitions
+    {
+        greet: goto greet on true;
+    }
+}
+
+node greet
+{
+    do
+    {
         if ($city == "новосибирск") {
             #say("greeting_nsk");
         } else if ($city == "санкт-петербург") {
