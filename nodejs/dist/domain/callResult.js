@@ -6,6 +6,9 @@ var CallResult = /** @class */ (function () {
         this.isAnswered = function () {
             return _this.answered;
         };
+        this.setAnswered = function (flag) {
+            _this.answered = flag;
+        };
         this.isSuccess = function () {
             return _this.success;
         };
