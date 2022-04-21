@@ -18,6 +18,10 @@ class CallResult{
         return this.answered
     }
 
+    setAnswered = (flag: boolean) => {
+        this.answered = flag
+    }
+
     isSuccess = ()=>{
         return this.success
     }

@@ -238,7 +238,11 @@ export default class TasksService {
       const result = await conv.execute({ channel: chatMode ? "text" : "audio" });
 
       console.log(result)
+      
       let callResult = new CallResult(result.output.answered == true, result.output.positive_or_negative == true, result.output.ask_call_later == true, result.recordingUrl?result.recordingUrl:"")
+      if (result.output.status == 'AnsweringMachine'){
+        callResult.setAnswered(false)
+      }
       return callResult
     }
 
