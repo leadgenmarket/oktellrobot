@@ -24,6 +24,7 @@ const client: mongoDB.MongoClient = new mongoDB.MongoClient("mongodb://" + proce
 client.connect()
 
 let repositories = new Repositories(client, dbName)
+
 let services = new Services(repositories, process.env.APP_TYPE == "outbound")
 let handlers = new Handlers(app, services)
 handlers.initHandlers()

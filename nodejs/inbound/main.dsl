@@ -18,7 +18,6 @@ start node root
         #connectSafe("");
         #waitForSpeech(1000);
         #say("greet_simple");
-        set $answered=true;
         wait *;
     }
     transitions
@@ -33,8 +32,7 @@ start node root
 node who_are_you {
     do
     {
-        
-       
+        set $answered=true;
         #say("who_are_you");
         goto do_you_want_to_buy;
     }
@@ -46,7 +44,8 @@ node who_are_you {
 
 node number_question {
     do 
-    {
+    {   
+        set $answered=true;
         #say("number_question");
         wait *;
     }
@@ -77,6 +76,7 @@ node succees
 {
     do
     {
+        set $answered=true;
         set $positive_or_negative=true;
         #say("city_question");
         wait *;
@@ -125,6 +125,7 @@ node negative
 {
      do
     {
+        set $answered=true;
         #say("sorry_wont_call");
         set $positive_or_negative=false;
         exit;

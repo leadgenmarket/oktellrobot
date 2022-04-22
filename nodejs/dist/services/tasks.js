@@ -199,7 +199,7 @@ var TasksService = /** @class */ (function () {
                         return [4 /*yield*/, this.repository.tasks.getTasksToCall()];
                     case 1:
                         callsList = _a.sent();
-                        return [4 /*yield*/, this.dashaApi.start({ concurrency: 5 })];
+                        return [4 /*yield*/, this.dashaApi.start({ concurrency: 1 })];
                     case 2:
                         _a.sent();
                         return [4 /*yield*/, Promise.all(callsList.map(function (task) { return __awaiter(_this, void 0, void 0, function () {

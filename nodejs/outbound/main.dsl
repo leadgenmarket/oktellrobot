@@ -38,7 +38,6 @@ node greet
         } else {
             #say("greeting_msk");
         }
-        set $answered=true;
         wait *;
     }
     transitions
@@ -53,6 +52,7 @@ node greet
 node who_are_you {
     do
     {
+        set $answered=true;
         if ($city == "новосибирск") {
             #say("who_are_you_nsk");
         } else if ($city == "санкт-петербург") {
@@ -73,6 +73,7 @@ node who_are_you {
 node number_question {
     do 
     {
+        set $answered=true;
         #say("number_question");
         wait *;
     }
@@ -87,6 +88,7 @@ node number_question {
 node do_you_want_to_buy {
     do
     {
+        set $answered=true;
         #say("do_you_want_to_buy");
         wait *;
     }
@@ -103,7 +105,7 @@ node succees
 {
     do
     {
-        
+        set $answered=true;
         set $positive_or_negative=true;
         //если исходящий, то говорим спасибо и выходим
         #say("success");
@@ -118,6 +120,7 @@ node negative
 {
      do
     {
+        set $answered=true;
         #say("sorry_wont_call");
         set $positive_or_negative=false;
         exit;
