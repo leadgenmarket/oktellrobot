@@ -256,7 +256,7 @@ var TasksService = /** @class */ (function () {
                                         case 11: return [2 /*return*/];
                                     }
                                 });
-                            }); }))];
+                            }); })).catch(function (err) { return console.log('Catch', err); })];
                     case 3:
                         _a.sent();
                         return [4 /*yield*/, this.dashaApi.stop()];
