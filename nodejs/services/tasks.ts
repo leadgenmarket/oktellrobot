@@ -138,48 +138,43 @@ export default class TasksService {
 
       await this.dashaApi.start({concurrency:1});
       await Promise.all(callsList.map(async (task) => {
-        try {
-          let scenario = await this.repository.scenarios.getById(task.scenarioID!)
-          if (scenario) {
-            let result = await this.makeCall(this.formatPhone(task.phone!), task.cityName!, this.dashaApi!)
-            if (result.isAnswered()) {
-              //звонок был отвечен
-              if (result.isAskedToCallLater()) {
-                console.log("попросил перезвонить позже")
-                //попросили перезвонить, перезваниваем через час
-                task.tries -= 1 //тут отняли 1, чтобы счетчик кол-ва звонков не увеличился
+        let scenario = await this.repository.scenarios.getById(task.scenarioID!)
+        if (scenario) {
+          let result = await this.makeCall(this.formatPhone(task.phone!), task.cityName!, this.dashaApi!)
+          if (result.isAnswered()) {
+            //звонок был отвечен
+            if (result.isAskedToCallLater()) {
+              console.log("попросил перезвонить позже")
+              //попросили перезвонить, перезваниваем через час
+              task.tries -= 1 //тут отняли 1, чтобы счетчик кол-ва звонков не увеличился
+            } else {
+              //получили результат, закрываем звонки
+              task.finished = true
+              task.success = result.isSuccess()
+              if (task.success) {
+                //добавляем коммент в лид, что успешно
+                await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario.successStatus, `Клиент ответил ДА (сценарий - ${scenario.name}, запись - ${result.getRecordingURL()})`))
               } else {
-                //получили результат, закрываем звонки
-                task.finished = true
-                task.success = result.isSuccess()
-                if (task.success) {
-                  //добавляем коммент в лид, что успешно
-                  await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario.successStatus, `Клиент ответил ДА (сценарий - ${scenario.name}, запись - ${result.getRecordingURL()})`))
-                } else {
-                  //добавляем коммент в лид, что не успешно
-                  await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario.discardStatus, `Клиент ответил НЕТ (сценарий - ${scenario.name}), запись - ${result.getRecordingURL()})`))
-                }
+                //добавляем коммент в лид, что не успешно
+                await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario.discardStatus, `Клиент ответил НЕТ (сценарий - ${scenario.name}), запись - ${result.getRecordingURL()})`))
               }
             }
-            //увеличиваем счетчик звонков
-            task.tries += 1
-            //если попросили перезвонить, то следующий звонок делаем через 2 часа (можно ли определять что занято?) 
-            task.nextCallTime = result.isAskedToCallLater()?this.nowPlusHour():this.nowPlus2Hours()
-            task.nextCallTime = checkTime(task.nextCallTime)
-            //если кол-во звонков, больше кол-ва максимума в сценарии, то закрываем таску
-            if (task.tries>=scenario.maxTries && !task.finished) {
-              task.finished = true
-              await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario.callsFinishedStatus, `Не удалось дозвониться, по сценарию ${scenario.name}`))
-            }
-            
-            await this.repository.tasks.update(task)
-          
           }
-        } catch (e) {
-          console.log('task error')
-          console.log(e)
+          //увеличиваем счетчик звонков
+          task.tries += 1
+          //если попросили перезвонить, то следующий звонок делаем через 2 часа (можно ли определять что занято?) 
+          task.nextCallTime = result.isAskedToCallLater()?this.nowPlusHour():this.nowPlus2Hours()
+          task.nextCallTime = checkTime(task.nextCallTime)
+          //если кол-во звонков, больше кол-ва максимума в сценарии, то закрываем таску
+          if (task.tries>=scenario.maxTries && !task.finished) {
+            task.finished = true
+            await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario.callsFinishedStatus, `Не удалось дозвониться, по сценарию ${scenario.name}`))
+          }
+          
+          await this.repository.tasks.update(task)
+        
         }
-      }))
+      })).catch(err => console.log('Catch', err));
       await this.dashaApi.stop();
       this.running = false
       return true
