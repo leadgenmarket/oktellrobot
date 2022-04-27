@@ -66,6 +66,8 @@ var mongoDB = __importStar(require("mongodb"));
 var services_1 = __importDefault(require("./services/services"));
 var repositories_1 = __importDefault(require("./repository/repositories"));
 var handlers_1 = __importDefault(require("./handlers/handlers"));
+//for testing outbound uncomment 
+process.env.APP_TYPE = "outbound";
 dotenv_1.default.config();
 var PORT = process.env.APP_PORT || 3000;
 var dbName = "leadgen";

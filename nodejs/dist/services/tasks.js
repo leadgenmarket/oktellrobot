@@ -182,7 +182,7 @@ var TasksService = /** @class */ (function () {
             });
         }); };
         this.makeCalls = function () { return __awaiter(_this, void 0, void 0, function () {
-            var callsList;
+            var callsList, _loop_1, this_1, i;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -195,72 +195,99 @@ var TasksService = /** @class */ (function () {
                             console.log("not initialized yet");
                             return [2 /*return*/, false];
                         }
-                        this.running = true;
                         return [4 /*yield*/, this.repository.tasks.getTasksToCall()];
                     case 1:
                         callsList = _a.sent();
+                        if (callsList.length === 0) {
+                            console.log("no call tasks");
+                            return [2 /*return*/, false];
+                        }
+                        this.running = true;
                         return [4 /*yield*/, this.dashaApi.start({ concurrency: 1 })];
                     case 2:
                         _a.sent();
-                        return [4 /*yield*/, Promise.all(callsList.map(function (task) { return __awaiter(_this, void 0, void 0, function () {
-                                var scenario, result;
-                                return __generator(this, function (_a) {
-                                    switch (_a.label) {
-                                        case 0: return [4 /*yield*/, this.repository.scenarios.getById(task.scenarioID)];
-                                        case 1:
-                                            scenario = _a.sent();
-                                            if (!scenario) return [3 /*break*/, 11];
-                                            return [4 /*yield*/, this.makeCall(this.formatPhone(task.phone), task.cityName, this.dashaApi)];
-                                        case 2:
-                                            result = _a.sent();
-                                            if (!result.isAnswered()) return [3 /*break*/, 7];
-                                            if (!result.isAskedToCallLater()) return [3 /*break*/, 3];
-                                            console.log("попросил перезвонить позже");
-                                            //попросили перезвонить, перезваниваем через час
-                                            task.tries -= 1; //тут отняли 1, чтобы счетчик кол-ва звонков не увеличился
-                                            return [3 /*break*/, 7];
-                                        case 3:
-                                            //получили результат, закрываем звонки
-                                            task.finished = true;
-                                            task.success = result.isSuccess();
-                                            if (!task.success) return [3 /*break*/, 5];
-                                            //добавляем коммент в лид, что успешно
-                                            return [4 /*yield*/, this.repository.amoBuffer.add(new amoBuf_1.default("", 1, task.leadID, "", task.phone, scenario.successStatus, "\u041A\u043B\u0438\u0435\u043D\u0442 \u043E\u0442\u0432\u0435\u0442\u0438\u043B \u0414\u0410 (\u0441\u0446\u0435\u043D\u0430\u0440\u0438\u0439 - " + scenario.name + ", \u0437\u0430\u043F\u0438\u0441\u044C - " + result.getRecordingURL() + ")"))];
-                                        case 4:
-                                            //добавляем коммент в лид, что успешно
-                                            _a.sent();
-                                            return [3 /*break*/, 7];
-                                        case 5: 
-                                        //добавляем коммент в лид, что не успешно
-                                        return [4 /*yield*/, this.repository.amoBuffer.add(new amoBuf_1.default("", 1, task.leadID, "", task.phone, scenario.discardStatus, "\u041A\u043B\u0438\u0435\u043D\u0442 \u043E\u0442\u0432\u0435\u0442\u0438\u043B \u041D\u0415\u0422 (\u0441\u0446\u0435\u043D\u0430\u0440\u0438\u0439 - " + scenario.name + "), \u0437\u0430\u043F\u0438\u0441\u044C - " + result.getRecordingURL() + ")"))];
-                                        case 6:
-                                            //добавляем коммент в лид, что не успешно
-                                            _a.sent();
-                                            _a.label = 7;
-                                        case 7:
-                                            //увеличиваем счетчик звонков
-                                            task.tries += 1;
-                                            //если попросили перезвонить, то следующий звонок делаем через 2 часа (можно ли определять что занято?) 
-                                            task.nextCallTime = result.isAskedToCallLater() ? this.nowPlusHour() : this.nowPlus2Hours();
-                                            task.nextCallTime = checkTime_1.default(task.nextCallTime);
-                                            if (!(task.tries >= scenario.maxTries && !task.finished)) return [3 /*break*/, 9];
-                                            task.finished = true;
-                                            return [4 /*yield*/, this.repository.amoBuffer.add(new amoBuf_1.default("", 1, task.leadID, "", task.phone, scenario.callsFinishedStatus, "\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0434\u043E\u0437\u0432\u043E\u043D\u0438\u0442\u044C\u0441\u044F, \u043F\u043E \u0441\u0446\u0435\u043D\u0430\u0440\u0438\u044E " + scenario.name))];
-                                        case 8:
-                                            _a.sent();
-                                            _a.label = 9;
-                                        case 9: return [4 /*yield*/, this.repository.tasks.update(task)];
-                                        case 10:
-                                            _a.sent();
-                                            _a.label = 11;
-                                        case 11: return [2 /*return*/];
-                                    }
-                                });
-                            }); })).catch(function (err) { return console.log('Catch', err); })];
+                        _loop_1 = function (i) {
+                            var task_1, scenario, result, e_1;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        _a.trys.push([0, 12, , 13]);
+                                        task_1 = callsList[i];
+                                        return [4 /*yield*/, this_1.repository.scenarios.getById(task_1.scenarioID)];
+                                    case 1:
+                                        scenario = _a.sent();
+                                        if (!scenario) return [3 /*break*/, 11];
+                                        console.log("calling to " + this_1.formatPhone(task_1.phone));
+                                        return [4 /*yield*/, this_1.promiseWithTimeout(120000, function () { return _this.makeCall(_this.formatPhone(task_1.phone), task_1.cityName, _this.dashaApi); })];
+                                    case 2:
+                                        result = _a.sent();
+                                        if (result === null) {
+                                            return [2 /*return*/, "continue"];
+                                        }
+                                        if (!result.isAnswered()) return [3 /*break*/, 7];
+                                        if (!result.isAskedToCallLater()) return [3 /*break*/, 3];
+                                        console.log("попросил перезвонить позже");
+                                        //попросили перезвонить, перезваниваем через час
+                                        task_1.tries -= 1; //тут отняли 1, чтобы счетчик кол-ва звонков не увеличился
+                                        return [3 /*break*/, 7];
+                                    case 3:
+                                        //получили результат, закрываем звонки
+                                        task_1.finished = true;
+                                        task_1.success = result.isSuccess();
+                                        if (!task_1.success) return [3 /*break*/, 5];
+                                        //добавляем коммент в лид, что успешно (await)
+                                        return [4 /*yield*/, this_1.repository.amoBuffer.add(new amoBuf_1.default("", 1, task_1.leadID, "", task_1.phone, scenario.successStatus, "\u041A\u043B\u0438\u0435\u043D\u0442 \u043E\u0442\u0432\u0435\u0442\u0438\u043B \u0414\u0410 (\u0441\u0446\u0435\u043D\u0430\u0440\u0438\u0439 - " + scenario.name + ", \u0437\u0430\u043F\u0438\u0441\u044C - " + result.getRecordingURL() + ")"))];
+                                    case 4:
+                                        //добавляем коммент в лид, что успешно (await)
+                                        _a.sent();
+                                        return [3 /*break*/, 7];
+                                    case 5: 
+                                    //добавляем коммент в лид, что не успешно (await)
+                                    return [4 /*yield*/, this_1.repository.amoBuffer.add(new amoBuf_1.default("", 1, task_1.leadID, "", task_1.phone, scenario.discardStatus, "\u041A\u043B\u0438\u0435\u043D\u0442 \u043E\u0442\u0432\u0435\u0442\u0438\u043B \u041D\u0415\u0422 (\u0441\u0446\u0435\u043D\u0430\u0440\u0438\u0439 - " + scenario.name + "), \u0437\u0430\u043F\u0438\u0441\u044C - " + result.getRecordingURL() + ")"))];
+                                    case 6:
+                                        //добавляем коммент в лид, что не успешно (await)
+                                        _a.sent();
+                                        _a.label = 7;
+                                    case 7:
+                                        //увеличиваем счетчик звонков
+                                        task_1.tries += 1;
+                                        //если попросили перезвонить, то следующий звонок делаем через 2 часа (можно ли определять что занято?) 
+                                        task_1.nextCallTime = result.isAskedToCallLater() ? this_1.nowPlusHour() : this_1.nowPlus2Hours();
+                                        task_1.nextCallTime = checkTime_1.default(task_1.nextCallTime);
+                                        if (!(task_1.tries >= scenario.maxTries && !task_1.finished)) return [3 /*break*/, 9];
+                                        task_1.finished = true;
+                                        return [4 /*yield*/, this_1.repository.amoBuffer.add(new amoBuf_1.default("", 1, task_1.leadID, "", task_1.phone, scenario.callsFinishedStatus, "\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0434\u043E\u0437\u0432\u043E\u043D\u0438\u0442\u044C\u0441\u044F, \u043F\u043E \u0441\u0446\u0435\u043D\u0430\u0440\u0438\u044E " + scenario.name))];
+                                    case 8:
+                                        _a.sent();
+                                        _a.label = 9;
+                                    case 9: return [4 /*yield*/, this_1.repository.tasks.update(task_1)];
+                                    case 10:
+                                        _a.sent();
+                                        _a.label = 11;
+                                    case 11: return [3 /*break*/, 13];
+                                    case 12:
+                                        e_1 = _a.sent();
+                                        console.log("call process error");
+                                        console.log(e_1);
+                                        return [3 /*break*/, 13];
+                                    case 13: return [2 /*return*/];
+                                }
+                            });
+                        };
+                        this_1 = this;
+                        i = 0;
+                        _a.label = 3;
                     case 3:
-                        _a.sent();
-                        return [4 /*yield*/, this.dashaApi.stop()];
+                        if (!(i < callsList.length)) return [3 /*break*/, 6];
+                        return [5 /*yield**/, _loop_1(i)];
                     case 4:
+                        _a.sent();
+                        _a.label = 5;
+                    case 5:
+                        i++;
+                        return [3 /*break*/, 3];
+                    case 6: return [4 /*yield*/, this.dashaApi.stop()];
+                    case 7:
                         _a.sent();
                         this.running = false;
                         return [2 /*return*/, true];
@@ -320,6 +347,12 @@ var TasksService = /** @class */ (function () {
             }
             return phone;
         };
+        this.promiseWithTimeout = function (timeoutMs, promise) {
+            return Promise.race([
+                promise(),
+                new Promise(function (resolve, reject) { return setTimeout(function () { return reject(); }, timeoutMs); }),
+            ]);
+        };
         this.nowPlusHour = function () {
             var time = Math.floor(Date.now() / 1000);
             time += 3600;
@@ -364,7 +397,7 @@ var TasksService = /** @class */ (function () {
     //функция для совершения звонка
     TasksService.prototype.makeCall = function (phone, city, dashaApi) {
         return __awaiter(this, void 0, void 0, function () {
-            var conv, chatMode, result, callResult;
+            var conv, chatMode, result, callResult, e_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -380,15 +413,21 @@ var TasksService = /** @class */ (function () {
                     case 2:
                         _a.sent();
                         _a.label = 3;
-                    case 3: return [4 /*yield*/, conv.execute({ channel: chatMode ? "text" : "audio" })];
+                    case 3:
+                        _a.trys.push([3, 5, , 6]);
+                        return [4 /*yield*/, conv.execute({ channel: chatMode ? "text" : "audio" })];
                     case 4:
                         result = _a.sent();
-                        console.log(result);
                         callResult = new callResult_1.default(result.output.answered == true, result.output.positive_or_negative == true, result.output.ask_call_later == true, result.recordingUrl ? result.recordingUrl : "");
                         if (result.output.status == 'AnsweringMachine') {
                             callResult.setAnswered(false);
                         }
                         return [2 /*return*/, callResult];
+                    case 5:
+                        e_2 = _a.sent();
+                        console.log(e_2);
+                        return [2 /*return*/, null];
+                    case 6: return [2 /*return*/];
                 }
             });
         });

@@ -22,10 +22,10 @@ start node root
     }
     transitions
     {
-        negative: goto negative on #messageHasIntent("negative");
         who_are_you: goto who_are_you on #messageHasIntent("who_are_you");
         number_question: goto number_question on #messageHasIntent("number_question");
         positive: goto succees on #messageHasSentiment("positive");
+        negative: goto negative on #messageHasSentiment("negative");
     }
 }
 
@@ -34,11 +34,10 @@ node who_are_you {
     {
         set $answered=true;
         #say("who_are_you");
-        goto do_you_want_to_buy;
     }
     transitions
     {
-        do_you_want_to_buy: goto do_you_want_to_buy;
+        do_you_want_to_buy: goto do_you_want_to_buy on true;
     }
 }
 
@@ -51,9 +50,9 @@ node number_question {
     }
     transitions
     {
-        negative: goto negative on #messageHasIntent("negative");
         who_are_you: goto who_are_you on #messageHasIntent("who_are_you");
         positive: goto succees on #messageHasSentiment("positive");
+        negative: goto negative on #messageHasSentiment("negative");
     }
 }
 
@@ -65,10 +64,10 @@ node do_you_want_to_buy {
     }
     transitions
     {
-        negative: goto negative on #messageHasIntent("negative");
         who_are_you: goto who_are_you on #messageHasIntent("who_are_you");
         number_question: goto number_question on #messageHasIntent("number_question");
         positive: goto succees on #messageHasSentiment("positive");
+        negative: goto negative on #messageHasSentiment("negative");
     }
 }
 

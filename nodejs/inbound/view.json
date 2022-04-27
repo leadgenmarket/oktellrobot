@@ -1,8 +1,8 @@
 {
   "node::root": {
     "common.position": {
-      "x": 535.8739917495594,
-      "y": 171.47545472005436
+      "x": -1056.5760940385112,
+      "y": -64.37697781709981
     }
   },
   "node::greeting": {
@@ -109,20 +109,20 @@
   },
   "node::repeat_or_ping_hangup": {
     "common.position": {
-      "x": -438.3636715006058,
-      "y": -226.3215915817312
+      "x": 833.2098835185575,
+      "y": -750.4421848316981
     }
   },
   "node::hello_hangup": {
     "common.position": {
-      "x": -460.3582333217101,
-      "y": 49.023250607510136
+      "x": 491.2538137856936,
+      "y": -547.927643104191
     }
   },
   "node::dont_understand_hangup": {
     "common.position": {
-      "x": -470.7727720305336,
-      "y": 295.58140371478237
+      "x": 513.373718302139,
+      "y": -428.2371231083267
     }
   },
   "node::positive_or_negative": {
@@ -151,14 +151,152 @@
   },
   "node::negative": {
     "common.position": {
-      "x": 560.6827359950622,
-      "y": 390.38704264717865
+      "x": 410.6288176799092,
+      "y": 389.57207223583583
     }
   },
   "node::positive": {
     "common.position": {
       "x": 600,
       "y": 452.7155118659144
+    }
+  },
+  "node::dont_understand_city": {
+    "common.position": {
+      "x": 1271.550348725236,
+      "y": -77.52741712800145
+    }
+  },
+  "node::validate_city_name": {
+    "common.position": {
+      "x": 811.1627766611759,
+      "y": -95.68054575215349
+    }
+  },
+  "node::succees": {
+    "common.position": {
+      "x": 373.41508774040193,
+      "y": -183.26165320651538
+    }
+  },
+  "node::do_you_want_to_buy": {
+    "common.position": {
+      "x": -10.816647161202702,
+      "y": 55.28474445222204
+    }
+  },
+  "node::number_question": {
+    "common.position": {
+      "x": -495.1458128514982,
+      "y": 449.9334570136539
+    }
+  },
+  "node::who_are_you": {
+    "common.position": {
+      "x": -534.0671207127255,
+      "y": 45.22211026535271
+    }
+  },
+  "node::hangup": {
+    "common.position": {
+      "x": 1705.1566476921569,
+      "y": -137.31411863463933
+    }
+  },
+  "node::swear_words": {
+    "common.position": {
+      "x": 1645.7511836747433,
+      "y": 576.8619544418352
+    }
+  },
+  "node::sorry_wont_call": {
+    "common.position": {
+      "x": 1664.8859007687352,
+      "y": -405.89543512160714
+    }
+  },
+  "node::wait": {
+    "common.position": {
+      "x": 1672.307133976744,
+      "y": 726.486277986347
+    }
+  },
+  "node::ping": {
+    "common.position": {
+      "x": 1323.6235573864908,
+      "y": -728.2208448219992
+    }
+  },
+  "node::repeat": {
+    "common.position": {
+      "x": 344.1537804862701,
+      "y": -775.1609242799148
+    }
+  },
+  "node::repeat_hangup_params": {
+    "common.position": {
+      "x": 1682.1300805339815,
+      "y": -305.8271363011757
+    }
+  },
+  "node::repeat_preprocessor": {
+    "common.position": {
+      "x": 1653.147539785388,
+      "y": 45.23991678778304
+    }
+  },
+  "node::i_am_robot": {
+    "common.position": {
+      "x": 1679.0216528775009,
+      "y": -44.01057670413512
+    }
+  },
+  "node::hello_preprocessor": {
+    "common.position": {
+      "x": 1707.5896767741515,
+      "y": -229.34484220757457
+    }
+  },
+  "node::hello": {
+    "common.position": {
+      "x": 880,
+      "y": -536.9790703813443
+    }
+  },
+  "node::dont_understand_preprocessor": {
+    "common.position": {
+      "x": 1673.3497613172624,
+      "y": 127.4965298875614
+    }
+  },
+  "node::dont_understand": {
+    "common.position": {
+      "x": 934.760870513865,
+      "y": -415.4158055033947
+    }
+  },
+  "node::dont_understand_hangup_params": {
+    "common.position": {
+      "x": 1680.4569845483218,
+      "y": 206.99499867596532
+    }
+  },
+  "node::can_hear_you": {
+    "common.position": {
+      "x": 1696.3233359452356,
+      "y": 294.14824001552796
+    }
+  },
+  "node::i_will_call_back": {
+    "common.position": {
+      "x": 1657.2972343617732,
+      "y": 379.43209956883044
+    }
+  },
+  "node::answering_machine": {
+    "common.position": {
+      "x": 1642.0714203866312,
+      "y": 463.1012023689223
     }
   }
 }

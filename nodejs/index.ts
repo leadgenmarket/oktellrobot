@@ -8,6 +8,9 @@ import Services from './services/services';
 import Repositories from './repository/repositories';
 import Handlers from './handlers/handlers';
 
+//for testing outbound uncomment 
+process.env.APP_TYPE = "outbound"
+
 dotenv.config();
 
 const PORT = process.env.APP_PORT || 3000;

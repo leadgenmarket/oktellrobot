@@ -133,48 +133,60 @@ export default class TasksService {
         console.log("not initialized yet")
         return false
       }
-      this.running = true
       var callsList = await this.repository.tasks.getTasksToCall()
 
+      if (callsList.length===0) {
+        console.log("no call tasks")
+        return false
+      }
+      this.running = true
       await this.dashaApi.start({concurrency:1});
-      await Promise.all(callsList.map(async (task) => {
-        let scenario = await this.repository.scenarios.getById(task.scenarioID!)
-        if (scenario) {
-          let result = await this.makeCall(this.formatPhone(task.phone!), task.cityName!, this.dashaApi!)
-          if (result.isAnswered()) {
-            //звонок был отвечен
-            if (result.isAskedToCallLater()) {
-              console.log("попросил перезвонить позже")
-              //попросили перезвонить, перезваниваем через час
-              task.tries -= 1 //тут отняли 1, чтобы счетчик кол-ва звонков не увеличился
-            } else {
-              //получили результат, закрываем звонки
-              task.finished = true
-              task.success = result.isSuccess()
-              if (task.success) {
-                //добавляем коммент в лид, что успешно
-                await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario.successStatus, `Клиент ответил ДА (сценарий - ${scenario.name}, запись - ${result.getRecordingURL()})`))
+      for (let i= 0; i < callsList.length; i++) {
+        try {
+          let task = callsList[i]
+          let scenario = await this.repository.scenarios.getById(task.scenarioID!)
+          if (scenario) {
+            console.log("calling to " + this.formatPhone(task.phone!))
+            let result = await this.promiseWithTimeout(120000, () =>this.makeCall(this.formatPhone(task.phone!), task.cityName!, this.dashaApi!))
+            if (result === null) {
+              continue
+            }
+            if (result.isAnswered()) {
+              //звонок был отвечен
+              if (result.isAskedToCallLater()) {
+                console.log("попросил перезвонить позже")
+                //попросили перезвонить, перезваниваем через час
+                task.tries -= 1 //тут отняли 1, чтобы счетчик кол-ва звонков не увеличился
               } else {
-                //добавляем коммент в лид, что не успешно
-                await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario.discardStatus, `Клиент ответил НЕТ (сценарий - ${scenario.name}), запись - ${result.getRecordingURL()})`))
+                //получили результат, закрываем звонки
+                task.finished = true
+                task.success = result.isSuccess()
+                if (task.success) {
+                  //добавляем коммент в лид, что успешно (await)
+                  await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario.successStatus, `Клиент ответил ДА (сценарий - ${scenario.name}, запись - ${result.getRecordingURL()})`))
+                } else {
+                  //добавляем коммент в лид, что не успешно (await)
+                  await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario.discardStatus, `Клиент ответил НЕТ (сценарий - ${scenario.name}), запись - ${result.getRecordingURL()})`))
+                }
               }
             }
+            //увеличиваем счетчик звонков
+            task.tries += 1
+            //если попросили перезвонить, то следующий звонок делаем через 2 часа (можно ли определять что занято?) 
+            task.nextCallTime = result.isAskedToCallLater()?this.nowPlusHour():this.nowPlus2Hours()
+            task.nextCallTime = checkTime(task.nextCallTime)
+            //если кол-во звонков, больше кол-ва максимума в сценарии, то закрываем таску (await)
+            if (task.tries>=scenario.maxTries && !task.finished) {
+              task.finished = true
+              await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario.callsFinishedStatus, `Не удалось дозвониться, по сценарию ${scenario.name}`))
+            }
+            await this.repository.tasks.update(task)
           }
-          //увеличиваем счетчик звонков
-          task.tries += 1
-          //если попросили перезвонить, то следующий звонок делаем через 2 часа (можно ли определять что занято?) 
-          task.nextCallTime = result.isAskedToCallLater()?this.nowPlusHour():this.nowPlus2Hours()
-          task.nextCallTime = checkTime(task.nextCallTime)
-          //если кол-во звонков, больше кол-ва максимума в сценарии, то закрываем таску
-          if (task.tries>=scenario.maxTries && !task.finished) {
-            task.finished = true
-            await this.repository.amoBuffer.add(new AmoBuffer("", 1, task.leadID, "", task.phone, scenario.callsFinishedStatus, `Не удалось дозвониться, по сценарию ${scenario.name}`))
-          }
-          
-          await this.repository.tasks.update(task)
-        
+        } catch (e){
+          console.log("call process error")
+          console.log(e)
         }
-      })).catch(err => console.log('Catch', err));
+      }
       await this.dashaApi.stop();
       this.running = false
       return true
@@ -217,8 +229,15 @@ export default class TasksService {
       return phone
     }
 
+    protected promiseWithTimeout = (timeoutMs: number, promise: () => Promise<any>) => {
+      return Promise.race([
+        promise(),
+        new Promise((resolve, reject) => setTimeout(() => reject(), timeoutMs)),
+      ]);
+    }
+
     //функция для совершения звонка
-    protected async makeCall(phone: string, city:string, dashaApi: dasha.Application<Record<string, unknown>, Record<string, unknown>>):Promise<CallResult> {
+    protected async makeCall(phone: string, city:string, dashaApi: dasha.Application<Record<string, unknown>, Record<string, unknown>>):Promise<CallResult | null> {
 
       city = city.toLowerCase();
     
@@ -235,15 +254,18 @@ export default class TasksService {
         await dasha.chat.createConsoleChat(conv);
       }
 
-      const result = await conv.execute({ channel: chatMode ? "text" : "audio" });
-
-      console.log(result)
-      
-      let callResult = new CallResult(result.output.answered == true, result.output.positive_or_negative == true, result.output.ask_call_later == true, result.recordingUrl?result.recordingUrl:"")
-      if (result.output.status == 'AnsweringMachine'){
-        callResult.setAnswered(false)
+      try {
+        const result = await conv.execute({ channel: chatMode ? "text" : "audio" });
+        let callResult = new CallResult(result.output.answered == true, result.output.positive_or_negative == true, result.output.ask_call_later == true, result.recordingUrl?result.recordingUrl:"")
+        if (result.output.status == 'AnsweringMachine'){
+          callResult.setAnswered(false)
+        }
+        return callResult
+      } catch (e) {
+        console.log(e)
+        return null
       }
-      return callResult
+      
     }
 
     //входящие звонки
