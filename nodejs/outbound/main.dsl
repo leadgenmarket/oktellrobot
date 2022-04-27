@@ -22,6 +22,7 @@ start node root
     transitions
     {
         greet: goto greet on true;
+        answering_machine: goto justExit on #messageHasIntent("answering_machine");
     }
 }
 
@@ -44,6 +45,7 @@ node greet
     {
         who_are_you: goto who_are_you on #messageHasIntent("who_are_you");
         number_question: goto number_question on #messageHasIntent("number_question");
+        answering_machine: goto justExit on #messageHasIntent("answering_machine");
         positive: goto succees on #messageHasSentiment("positive");
         negative: goto negative on #messageHasSentiment("negative");
     }
@@ -123,6 +125,17 @@ node negative
         set $answered=true;
         #say("sorry_wont_call");
         set $positive_or_negative=false;
+        exit;
+    }
+    transitions
+    {
+    }
+}
+
+node justExit
+{
+    do
+    {
         exit;
     }
     transitions
