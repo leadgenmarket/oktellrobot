@@ -351,7 +351,10 @@ var TasksService = /** @class */ (function () {
         this.promiseWithTimeout = function (timeoutMs, promise) {
             return Promise.race([
                 promise(),
-                new Promise(function (resolve, reject) { return setTimeout(function () { return reject(); }, timeoutMs); }),
+                new Promise(function (resolve, reject) { return setTimeout(function () {
+                    reject();
+                    return null;
+                }, timeoutMs); }),
             ]);
         };
         this.nowPlusHour = function () {
