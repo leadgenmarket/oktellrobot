@@ -221,6 +221,7 @@ var TasksService = /** @class */ (function () {
                                         return [4 /*yield*/, this_1.promiseWithTimeout(120000, function () { return _this.makeCall(_this.formatPhone(task_1.phone), task_1.cityName, _this.dashaApi); })];
                                     case 2:
                                         result = _a.sent();
+                                        console.log(result);
                                         if (result === null) {
                                             return [2 /*return*/, "continue"];
                                         }
@@ -397,7 +398,7 @@ var TasksService = /** @class */ (function () {
     //функция для совершения звонка
     TasksService.prototype.makeCall = function (phone, city, dashaApi) {
         return __awaiter(this, void 0, void 0, function () {
-            var conv, chatMode, result, callResult, e_2;
+            var conv, chatMode, result, callResult;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -413,9 +414,7 @@ var TasksService = /** @class */ (function () {
                     case 2:
                         _a.sent();
                         _a.label = 3;
-                    case 3:
-                        _a.trys.push([3, 5, , 6]);
-                        return [4 /*yield*/, conv.execute({ channel: chatMode ? "text" : "audio" })];
+                    case 3: return [4 /*yield*/, conv.execute({ channel: chatMode ? "text" : "audio" })];
                     case 4:
                         result = _a.sent();
                         callResult = new callResult_1.default(result.output.answered == true, result.output.positive_or_negative == true, result.output.ask_call_later == true, result.recordingUrl ? result.recordingUrl : "");
@@ -423,11 +422,6 @@ var TasksService = /** @class */ (function () {
                             callResult.setAnswered(false);
                         }
                         return [2 /*return*/, callResult];
-                    case 5:
-                        e_2 = _a.sent();
-                        console.log(e_2);
-                        return [2 /*return*/, null];
-                    case 6: return [2 /*return*/];
                 }
             });
         });

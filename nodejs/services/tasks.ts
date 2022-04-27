@@ -148,6 +148,7 @@ export default class TasksService {
           if (scenario) {
             console.log("calling to " + this.formatPhone(task.phone!))
             let result = await this.promiseWithTimeout(120000, () =>this.makeCall(this.formatPhone(task.phone!), task.cityName!, this.dashaApi!))
+            console.log(result)
             if (result === null) {
               continue
             }
@@ -232,7 +233,10 @@ export default class TasksService {
     protected promiseWithTimeout = (timeoutMs: number, promise: () => Promise<any>) => {
       return Promise.race([
         promise(),
-        new Promise((resolve, reject) => setTimeout(() => reject(), timeoutMs)),
+        new Promise((resolve, reject) => setTimeout(() => {
+          reject();
+          return null
+        }, timeoutMs)),
       ]);
     }
 
@@ -254,18 +258,12 @@ export default class TasksService {
         await dasha.chat.createConsoleChat(conv);
       }
 
-      try {
-        const result = await conv.execute({ channel: chatMode ? "text" : "audio" });
-        let callResult = new CallResult(result.output.answered == true, result.output.positive_or_negative == true, result.output.ask_call_later == true, result.recordingUrl?result.recordingUrl:"")
-        if (result.output.status == 'AnsweringMachine'){
-          callResult.setAnswered(false)
-        }
-        return callResult
-      } catch (e) {
-        console.log(e)
-        return null
+      const result = await conv.execute({ channel: chatMode ? "text" : "audio" });
+      let callResult = new CallResult(result.output.answered == true, result.output.positive_or_negative == true, result.output.ask_call_later == true, result.recordingUrl?result.recordingUrl:"")
+      if (result.output.status == 'AnsweringMachine'){
+        callResult.setAnswered(false)
       }
-      
+      return callResult
     }
 
     //входящие звонки
